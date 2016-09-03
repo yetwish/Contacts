@@ -1,0 +1,5 @@
+<resources>
+    <string name="app_name">ContactsDemo</string>
+    <string name="contacts_title">联系人</string>
+    <string name="detail_title">联系人详情</string>
+</resources>
