@@ -2,4 +2,24 @@
     <string name="app_name">ContactsDemo</string>
     <string name="contacts_title">联系人</string>
     <string name="detail_title">联系人详情</string>
+    
+    <string-array name="testArray">
+        <item>Test Data1</item>
+        <item>Test Data2</item>
+        <item>Test Data3</item>
+        <item>Test Data4</item>
+        <item>Test Data5</item>
+        <item>Test Data6</item>
+        <item>Test Data7</item>
+        <item>Test Data8</item>
+        <item>Test Data9</item>
+        <item>Test Data0</item>
+        <item>Test Data0</item>
+        <item>Test Data0</item>
+        <item>Test Data0</item>
+        <item>Test Data0</item>
+        <item>Test Data0</item>
+        <item>Test Data0</item>
+        <item>Test Data0</item>
+    </string-array>
 </resources>

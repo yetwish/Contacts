@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical">
+
+    <TextView
+        android:gravity="center_vertical"
+        android:text="#"
+        android:textSize="@dimen/item_text_size"
+        android:paddingLeft="@dimen/item_list_padding_horizontal"
+        android:background="@color/colorLine"
+        android:id="@+id/tvContactsSections"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/item_sections_height">
+
+    </TextView>
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/item_list_height"
+        android:paddingLeft="@dimen/item_list_padding_horizontal"
+        android:paddingRight="@dimen/item_list_padding_horizontal">
+
+        <CheckBox
+            android:visibility="gone"
+            android:id="@+id/cbContactsItem"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerVertical="true"
+            android:layout_marginRight="@dimen/item_list_margin"/>
+
+        <TextView
+            android:textSize="@dimen/item_text_size"
+            android:id="@+id/tvContactsItem"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerVertical="true"
+            android:layout_toRightOf="@id/cbContactsItem"
+            android:text="hELLO!" />
+
+        <View
+            style="@style/SeparatorStyle"
+            android:layout_alignParentBottom="true" />
+    </RelativeLayout>
+
+
+</LinearLayout>
