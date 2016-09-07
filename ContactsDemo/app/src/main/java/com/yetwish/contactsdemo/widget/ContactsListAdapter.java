@@ -6,6 +6,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.CheckBox;
+import android.widget.SectionIndexer;
 import android.widget.TextView;
 
 import com.yetwish.contactsdemo.R;
@@ -19,7 +20,7 @@ import java.util.List;
  * 联系人列表adapter  todo cb  adapter与sectionIndexer 装饰者模式
  * Created by yetwish on 2016/9/6.
  */
-public class ContactsListAdapter extends BaseAdapter implements ISectionIndexer<Contacts>{
+public class ContactsListAdapter extends BaseAdapter implements SectionIndexer {
 
     private Context mContext;
     private List<Contacts> mData;
@@ -54,26 +55,33 @@ public class ContactsListAdapter extends BaseAdapter implements ISectionIndexer<
             holder.tvSections = (TextView) convertView.findViewById(R.id.tvContactsSections);
             holder.cbSelect = (CheckBox) convertView.findViewById(R.id.cbContactsItem);
             holder.tvName = (TextView) convertView.findViewById(R.id.tvContactsItem);
+            holder.line = convertView.findViewById(R.id.lineItem);
             convertView.setTag(holder);
         } else
             holder = (ViewHolder) convertView.getTag();
 
         holder.tvName.setText(mData.get(position).getName());
-        if (mData.get(position).isFirst())
+        if (mData.get(position).isFirst()) {
             holder.tvSections.setVisibility(View.VISIBLE);
-        else
+            holder.line.setVisibility(View.GONE);
+            holder.tvSections.setText((mData.get(position).getSortedKey().substring(0,1)).toUpperCase());
+        }
+        else{
             holder.tvSections.setVisibility(View.GONE);
+            holder.line.setVisibility(View.VISIBLE);
+        }
+
         return convertView;
     }
 
-    public void setSectionIndexer(ISectionIndexer sectionIndexer){
-        mIndexer = sectionIndexer;
+    public void setSectionIndexer(ISectionIndexer indexer) {
+        mIndexer = indexer;
     }
 
     @Override
     public String[] getSections() {
         checkSectionIndexerNotNull();
-        return mIndexer.getSections();
+        return (String[]) mIndexer.getSections();
     }
 
     @Override
@@ -88,27 +96,25 @@ public class ContactsListAdapter extends BaseAdapter implements ISectionIndexer<
         return mIndexer.getSectionForPosition(position);
     }
 
-    //todo
-    @Override
-    public void notifyDataChanged(List<Contacts> contacts) {
-    }
 
-    private void checkSectionIndexerNotNull(){
-        if(mIndexer == null){
+    private void checkSectionIndexerNotNull() {
+        if (mIndexer == null) {
             mIndexer = new ContactsSectionIndexer(mData);
         }
     }
 
-    //todo
     @Override
     public void notifyDataSetChanged() {
         super.notifyDataSetChanged();
-
+        if(mIndexer != null){
+            mIndexer.notifyDataChanged(mData);
+        }
     }
 
     private class ViewHolder {
         TextView tvSections;
         CheckBox cbSelect;
         TextView tvName;
+        View line;
     }
 }

@@ -6,6 +6,7 @@ import android.support.v7.app.AppCompatActivity;
 import com.yetwish.contactsdemo.model.Contacts;
 import com.yetwish.contactsdemo.widget.ContactsListAdapter;
 import com.yetwish.contactsdemo.widget.ContactsListView;
+import com.yetwish.contactsdemo.widget.indexer.ContactsSectionIndexer;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -23,6 +24,7 @@ public class ContactsListActivity extends AppCompatActivity {
         mContactsListView = (ContactsListView) findViewById(R.id.lvContactsList);
         syncContacts();
         mContactsListView.setAdapter(mContactsAdapter);
+        mContactsAdapter.setSectionIndexer(new ContactsSectionIndexer(mContactsDataList));
     }
 
     private void syncContacts() {

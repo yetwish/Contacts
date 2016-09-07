@@ -2,6 +2,7 @@ package com.yetwish.contactsdemo.widget.indexer;
 
 import android.graphics.Canvas;
 import android.view.MotionEvent;
+import android.widget.SectionIndexer;
 
 /**
  * IndexScroller接口，定义IndexScroll需要实现的方法
@@ -9,7 +10,7 @@ import android.view.MotionEvent;
  */
 public interface IIndexScroller {
 
-    public void setSectionIndexer(ISectionIndexer sectionIndexer);
+    public void setSectionIndexer(SectionIndexer indexer);
 
     public boolean onTouchEvent(MotionEvent event);
 

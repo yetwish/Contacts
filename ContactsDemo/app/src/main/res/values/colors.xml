@@ -4,10 +4,12 @@
     <color name="colorPrimaryDark">#303F9F</color>
     <color name="colorAccent">#FF4081</color>
 
-    <color name="colorWhite">#ffffff</color>
+    <color name="colorWhite">#efefef</color>
+    <color name="colorSections">#dfdfdf</color>
     <color name="colorBlack">#000000</color>
     <color name="colorBlackAlpha">#66000000</color>
     <color name="colorText">#333333</color>
+    <color name="colorIndexerText">#444444</color>
     <color name="colorSubText">#666666</color>
     <color name="colorLine">#cccccc</color>
 </resources>

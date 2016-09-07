@@ -3,16 +3,16 @@
     <dimen name="activity_horizontal_margin">16dp</dimen>
     <dimen name="activity_vertical_margin">16dp</dimen>
 
-    <dimen name="indexer_width">20dp</dimen>
+    <dimen name="indexer_width">22dp</dimen>
     <dimen name="indexer_preview_padding">10dp</dimen>
 
-    <dimen name="indexer_text_size">13sp</dimen>
+    <dimen name="indexer_text_size">15sp</dimen>
     <dimen name="indexer_preview_text_size">40sp</dimen>
 
 
 
     <dimen name="item_list_height">60dp</dimen>
-    <dimen name="item_sections_height">30dp</dimen>
+    <dimen name="item_sections_height">25dp</dimen>
     <dimen name="item_list_padding_horizontal">15dp</dimen>
     <dimen name="item_list_margin">8dp</dimen>
 

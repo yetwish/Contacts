@@ -4,8 +4,10 @@ import android.content.Context;
 import android.graphics.Canvas;
 import android.util.AttributeSet;
 import android.view.MotionEvent;
+import android.view.View;
 import android.widget.ListAdapter;
 import android.widget.ListView;
+import android.widget.SectionIndexer;
 
 import com.yetwish.contactsdemo.widget.indexer.IIndexScroller;
 import com.yetwish.contactsdemo.widget.indexer.ISectionIndexer;
@@ -24,14 +26,15 @@ public class ContactsListView extends ListView {
         super(context, attrs);
         mIndexScroller = new IndexScroller(context, this);
         this.setFastScrollEnabled(true);
+        this.setOverScrollMode(View.OVER_SCROLL_NEVER);
     }
 
     @Override
     public void setAdapter(ListAdapter adapter) {
         super.setAdapter(adapter);
         if (mIndexScroller != null) {
-            if (adapter instanceof ISectionIndexer) {
-                mIndexScroller.setSectionIndexer((ISectionIndexer) adapter);
+            if (adapter instanceof SectionIndexer) {
+                mIndexScroller.setSectionIndexer((SectionIndexer) adapter);
             }
         }
     }
@@ -42,8 +45,13 @@ public class ContactsListView extends ListView {
     }
 
     @Override
+    public boolean onInterceptTouchEvent(MotionEvent ev) {
+        return true;
+    }
+
+    @Override
     public void draw(Canvas canvas) {
-        super.draw(canvas);
+        super.draw(canvas); //绘制的时候通知索引图进行绘制
         if (mIndexScroller != null) {
             mIndexScroller.onDraw(canvas);
         }

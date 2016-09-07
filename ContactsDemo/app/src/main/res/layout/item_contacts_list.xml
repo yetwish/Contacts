@@ -5,14 +5,14 @@
     android:orientation="vertical">
 
     <TextView
-        android:gravity="center_vertical"
-        android:text="#"
-        android:textSize="@dimen/item_text_size"
-        android:paddingLeft="@dimen/item_list_padding_horizontal"
-        android:background="@color/colorLine"
         android:id="@+id/tvContactsSections"
         android:layout_width="match_parent"
-        android:layout_height="@dimen/item_sections_height">
+        android:layout_height="@dimen/item_sections_height"
+        android:background="@color/colorSections"
+        android:gravity="center_vertical"
+        android:paddingLeft="@dimen/item_list_padding_horizontal"
+        android:text="#"
+        android:textSize="@dimen/item_text_size">
 
     </TextView>
 
@@ -22,26 +22,30 @@
         android:paddingLeft="@dimen/item_list_padding_horizontal"
         android:paddingRight="@dimen/item_list_padding_horizontal">
 
+        <View
+            android:id="@+id/lineItem"
+            style="@style/SeparatorStyle"
+            android:layout_alignParentTop="true" />
+
         <CheckBox
-            android:visibility="gone"
             android:id="@+id/cbContactsItem"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_centerVertical="true"
-            android:layout_marginRight="@dimen/item_list_margin"/>
+            android:layout_marginRight="@dimen/item_list_margin"
+            android:focusable="false"
+            android:visibility="gone" />
 
         <TextView
-            android:textSize="@dimen/item_text_size"
             android:id="@+id/tvContactsItem"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_centerVertical="true"
             android:layout_toRightOf="@id/cbContactsItem"
-            android:text="hELLO!" />
+            android:text="hELLO!"
+            android:textSize="@dimen/item_text_size" />
 
-        <View
-            style="@style/SeparatorStyle"
-            android:layout_alignParentBottom="true" />
+
     </RelativeLayout>
 
 

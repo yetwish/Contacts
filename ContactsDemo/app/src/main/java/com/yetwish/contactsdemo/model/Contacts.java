@@ -21,7 +21,7 @@ public class Contacts implements Comparable<Contacts>{
         this.id = id;
         this.name = name;
         this.phoneNumber = phoneNumber;
-        this.sortedKey = sortedKey;
+        this.sortedKey = sortedKey.toUpperCase();
         this.isFirst = isFirst;
     }
 

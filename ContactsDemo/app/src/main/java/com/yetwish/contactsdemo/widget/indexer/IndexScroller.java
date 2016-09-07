@@ -7,6 +7,7 @@ import android.graphics.RectF;
 import android.support.v4.content.ContextCompat;
 import android.view.MotionEvent;
 import android.widget.ListView;
+import android.widget.SectionIndexer;
 
 import com.yetwish.contactsdemo.R;
 
@@ -19,7 +20,7 @@ public class IndexScroller implements IIndexScroller {
     private static final String TAG = IndexScroller.class.getSimpleName();
 
     private ListView mListView;
-    private ISectionIndexer mIndexer;
+    private SectionIndexer mIndexer;
     private String[] mSections;
     private Context mContext;
 
@@ -42,6 +43,8 @@ public class IndexScroller implements IIndexScroller {
     private float mListViewWidth;
     private float mListViewHeight;
 
+    private float mStatusBarHeight;
+
     private boolean isScroll;
     private int mCurIndex = -1;
 
@@ -51,12 +54,22 @@ public class IndexScroller implements IIndexScroller {
         this.mListView = listView;
         initPaint();
         initSizeInfo();
+        getStatusBarHeight();
+    }
+
+    private void getStatusBarHeight() {
+        //获取status_bar_height资源的ID
+        int resourceId = mContext.getResources().getIdentifier("status_bar_height", "dimen", "android");
+        if (resourceId > 0) {
+            //根据资源ID获取响应的尺寸值
+            mStatusBarHeight = mContext.getResources().getDimension(resourceId);
+        }
     }
 
     private void initPaint() {
 
         mIndexTextPaint = new Paint();
-        mIndexTextPaint.setColor(ContextCompat.getColor(mContext, R.color.colorText));
+        mIndexTextPaint.setColor(ContextCompat.getColor(mContext, R.color.colorIndexerText));
         mIndexTextPaint.setTextSize(mContext.getResources().getDimension(R.dimen.indexer_text_size));
 
         mPreviewTextPaint = new Paint();
@@ -88,9 +101,9 @@ public class IndexScroller implements IIndexScroller {
 
     //todo
     @Override
-    public void setSectionIndexer(ISectionIndexer sectionIndexer) {
-        mIndexer = sectionIndexer;
-        mSections = mIndexer.getSections();
+    public void setSectionIndexer(SectionIndexer indexer) {
+        mIndexer = indexer;
+        mSections = (String[]) mIndexer.getSections();
         if (mSections == null)
             throw new NullPointerException("sections cannot be null!");
 
@@ -106,8 +119,9 @@ public class IndexScroller implements IIndexScroller {
                     //根据y获取index
                     mCurIndex = obtainIndexByPosition(event.getY());
                     notifyCurIndexChanged();
+                    return true;
                 }
-                return true;
+                break;
             case MotionEvent.ACTION_MOVE:
                 if (isScroll) {
                     //move多次调用，当获取到index与mCurIndex不同时才需要通知listView.setSelection()
@@ -116,8 +130,9 @@ public class IndexScroller implements IIndexScroller {
                         mCurIndex = tempIndex;
                         notifyCurIndexChanged();
                     }
+                    return true;
                 }
-                return true;
+                break;
             case MotionEvent.ACTION_UP:
                 isScroll = false;
                 //motion_up时不占有事件分发，将touch事件分发下去
@@ -154,11 +169,13 @@ public class IndexScroller implements IIndexScroller {
     //draw indexBar
     private void drawIndexBar(Canvas canvas) {
         //draw bg
-        canvas.drawRect(mIndexRectF, mIndexBgPaint);
+        if(isScroll){
+            canvas.drawRect(mIndexRectF, mIndexBgPaint);
+        }
         //draw sections
         for (int i = 0; i < mSections.length; i++) {//draw indexes
             canvas.drawText(mSections[i], mIndexRectF.centerX() - mIndexTextPaint.measureText(mSections[i]) / 2,
-                    mIndexRectF.top + i * mIndexTextHeight, mIndexTextPaint);
+                    mIndexMarginTop + i * mIndexTextHeight, mIndexTextPaint);
         }
     }
 
@@ -166,9 +183,9 @@ public class IndexScroller implements IIndexScroller {
     private void drawPreview(Canvas canvas) {
         //draw bg
         canvas.drawRect(mPreviewRectF, mPreviewBgPaint);
-        //draw preview text
+        //draw preview text  ???todo
         canvas.drawText(mSections[mCurIndex], mPreviewRectF.centerX() - mPreviewTextPaint.measureText(mSections[mCurIndex]) / 2,
-                mPreviewRectF.top + mPreviewPadding, mPreviewTextPaint);
+                mPreviewRectF.centerY() - mPreviewTextHeight / 2 + mPreviewSize / 2, mPreviewTextPaint);
     }
 
     @Override
@@ -178,8 +195,10 @@ public class IndexScroller implements IIndexScroller {
         mListViewHeight = height;
         //根据listView的宽高 获取indexBar和preview的位置
         mIndexMarginTop = (mListViewHeight - mIndexBarHeight) / 2;
-        mIndexRectF = new RectF(mListViewWidth - mIndexBarWidth, mIndexMarginTop, mListViewWidth, mListViewHeight);
+        mIndexRectF = new RectF(mListViewWidth - mIndexBarWidth, 0, mListViewWidth, mListViewHeight);
         mPreviewRectF = new RectF(mListViewWidth / 2 - mPreviewSize / 2, mListViewHeight / 2 - mPreviewSize / 2,
                 mListViewWidth / 2 + mPreviewSize / 2, mListViewHeight / 2 + mPreviewSize / 2);
     }
+
+
 }

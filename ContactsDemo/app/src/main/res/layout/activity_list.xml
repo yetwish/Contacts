@@ -7,6 +7,7 @@
 
     <com.yetwish.contactsdemo.widget.ContactsListView
         android:id="@+id/lvContactsList"
+        android:divider="@null"
         android:layout_width="match_parent"
         android:layout_height="match_parent"/>
 

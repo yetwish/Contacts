@@ -54,22 +54,30 @@ public class ContactsSectionIndexer extends BaseAdapter implements ISectionIndex
 
     private void updateFirstItemAndPosition() {
         if (mContactsList.size() <= 1) return;
-        //根据sortedKey排序 todo
+        //根据sortedKey排序
         Collections.sort(mContactsList);
         //获取第一个preFirstChar,方便循环对比
         char preFirstChar = mContactsList.get(0).getSortedKey().charAt(0);
         mContactsList.get(0).setFirst(true);
-        int index = 0;
-        mPositions[index++] = 0;
+        int sectionCounts[] = new int[128]; //记录每个字母对应的contacts个数 128: 字母最大ascii 为122-'z';
+        int count = 1;
         for (int i = 1; i < mContactsList.size(); i++) {
             char firstChar = mContactsList.get(i).getSortedKey().charAt(0);
             if (firstChar != preFirstChar) {
+                sectionCounts[preFirstChar] = count;
                 preFirstChar = firstChar;
                 mContactsList.get(i).setFirst(true);
-                mPositions[index++] = i;
-            }
+                count = 1;
+            } else
+                count++;
         }
+        sectionCounts[preFirstChar] = count;
 
+        int i = count = 0;
+        do {
+            count += sectionCounts[mSections[i++].charAt(0)];
+            mPositions[i] = count;
+        } while (i < mSections.length - 1);
     }
 
     @Override
@@ -78,7 +86,7 @@ public class ContactsSectionIndexer extends BaseAdapter implements ISectionIndex
             return -1;
         int index = Arrays.binarySearch(mPositions, position);
 
-        return index >= 0 ? index : -index -2; //todo??
+        return index >= 0 ? index : -index - 2;
     }
 
 
