@@ -5,4 +5,9 @@
     android:layout_height="match_parent"
     tools:context=".ContactsListActivity">
 
+    <com.yetwish.contactsdemo.widget.ContactsListView
+        android:id="@+id/lvContactsList"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"/>
+
 </RelativeLayout>

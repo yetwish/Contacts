@@ -18,13 +18,9 @@ public class IndexScroller implements IIndexScroller {
 
     private static final String TAG = IndexScroller.class.getSimpleName();
 
-    //默认索引
-    public static final String DEFAULT_SECTIONS[] =
-            {"#", "A", "B", "C", "D", "E", "F", "G", "H",
-                    "I", "J", "K", "L", "M", "N", "O", "P", "Q",
-                    "R", "S", "T", "U", "V", "W", "X", "Y", "Z"};
-
     private ListView mListView;
+    private ISectionIndexer mIndexer;
+    private String[] mSections;
     private Context mContext;
 
     private Paint mIndexTextPaint;
@@ -82,12 +78,23 @@ public class IndexScroller implements IIndexScroller {
         Paint.FontMetrics fontMetrics = mIndexTextPaint.getFontMetrics();
         mIndexTextHeight = fontMetrics.descent - fontMetrics.ascent;
         mIndexBarWidth = mContext.getResources().getDimension(R.dimen.indexer_width);
-        mIndexBarHeight = mIndexTextHeight * DEFAULT_SECTIONS.length;
+
 
         fontMetrics = mPreviewTextPaint.getFontMetrics();
         mPreviewTextHeight = fontMetrics.descent - fontMetrics.ascent;
         mPreviewPadding = mContext.getResources().getDimension(R.dimen.indexer_preview_padding);
         mPreviewSize = mPreviewPadding * 2 + mPreviewTextHeight;
+    }
+
+    //todo
+    @Override
+    public void setSectionIndexer(ISectionIndexer sectionIndexer) {
+        mIndexer = sectionIndexer;
+        mSections = mIndexer.getSections();
+        if (mSections == null)
+            throw new NullPointerException("sections cannot be null!");
+
+        mIndexBarHeight = mIndexTextHeight * mSections.length;
     }
 
     @Override
@@ -130,9 +137,9 @@ public class IndexScroller implements IIndexScroller {
     private void notifyCurIndexChanged() {
         if (mListView == null || !isScroll)
             return;
-        if (mCurIndex < 0 || mCurIndex >= DEFAULT_SECTIONS.length)
+        if (mCurIndex < 0 || mCurIndex >= mSections.length)
             return;
-        mListView.setSelection(mCurIndex);
+        mListView.setSelection(mIndexer.getPositionForSection(mCurIndex));
     }
 
 
@@ -149,8 +156,8 @@ public class IndexScroller implements IIndexScroller {
         //draw bg
         canvas.drawRect(mIndexRectF, mIndexBgPaint);
         //draw sections
-        for (int i = 0; i < DEFAULT_SECTIONS.length; i++) {//draw indexes
-            canvas.drawText(DEFAULT_SECTIONS[i], mIndexRectF.centerX() - mIndexTextPaint.measureText(DEFAULT_SECTIONS[i]) / 2,
+        for (int i = 0; i < mSections.length; i++) {//draw indexes
+            canvas.drawText(mSections[i], mIndexRectF.centerX() - mIndexTextPaint.measureText(mSections[i]) / 2,
                     mIndexRectF.top + i * mIndexTextHeight, mIndexTextPaint);
         }
     }
@@ -160,7 +167,7 @@ public class IndexScroller implements IIndexScroller {
         //draw bg
         canvas.drawRect(mPreviewRectF, mPreviewBgPaint);
         //draw preview text
-        canvas.drawText(DEFAULT_SECTIONS[mCurIndex], mPreviewRectF.centerX() - mPreviewTextPaint.measureText(DEFAULT_SECTIONS[mCurIndex]) / 2,
+        canvas.drawText(mSections[mCurIndex], mPreviewRectF.centerX() - mPreviewTextPaint.measureText(mSections[mCurIndex]) / 2,
                 mPreviewRectF.top + mPreviewPadding, mPreviewTextPaint);
     }
 

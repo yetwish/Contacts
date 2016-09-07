@@ -9,10 +9,12 @@ import android.view.MotionEvent;
  */
 public interface IIndexScroller {
 
-    boolean onTouchEvent(MotionEvent event);
+    public void setSectionIndexer(ISectionIndexer sectionIndexer);
 
-    void onDraw(Canvas canvas);
+    public boolean onTouchEvent(MotionEvent event);
 
-    void onSizeChanged(int width, int height, int oldWidth, int oldHeight);
+    public void onDraw(Canvas canvas);
+
+    public void onSizeChanged(int width, int height, int oldWidth, int oldHeight);
 
 }

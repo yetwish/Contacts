@@ -4,9 +4,11 @@ import android.content.Context;
 import android.graphics.Canvas;
 import android.util.AttributeSet;
 import android.view.MotionEvent;
+import android.widget.ListAdapter;
 import android.widget.ListView;
 
 import com.yetwish.contactsdemo.widget.indexer.IIndexScroller;
+import com.yetwish.contactsdemo.widget.indexer.ISectionIndexer;
 import com.yetwish.contactsdemo.widget.indexer.IndexScroller;
 
 /**
@@ -22,6 +24,16 @@ public class ContactsListView extends ListView {
         super(context, attrs);
         mIndexScroller = new IndexScroller(context, this);
         this.setFastScrollEnabled(true);
+    }
+
+    @Override
+    public void setAdapter(ListAdapter adapter) {
+        super.setAdapter(adapter);
+        if (mIndexScroller != null) {
+            if (adapter instanceof ISectionIndexer) {
+                mIndexScroller.setSectionIndexer((ISectionIndexer) adapter);
+            }
+        }
     }
 
     @Override
