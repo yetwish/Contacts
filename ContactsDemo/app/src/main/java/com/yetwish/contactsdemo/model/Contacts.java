@@ -6,9 +6,9 @@ import java.util.List;
  * 联系人数据类
  * Created by yetwish on 2016/9/6.
  */
-public class Contacts implements Comparable<Contacts>{
+public class Contacts implements Comparable<Contacts> {
 
-    private long id;
+    private int id;
     private String name;
     private List<String> phoneNumber;
     private String sortedKey;
@@ -17,7 +17,7 @@ public class Contacts implements Comparable<Contacts>{
     public Contacts() {
     }
 
-    public Contacts(long id, String name, List<String> phoneNumber, String sortedKey, boolean isFirst) {
+    public Contacts(int id, String name, List<String> phoneNumber, String sortedKey, boolean isFirst) {
         this.id = id;
         this.name = name;
         this.phoneNumber = phoneNumber;
@@ -25,11 +25,11 @@ public class Contacts implements Comparable<Contacts>{
         this.isFirst = isFirst;
     }
 
-    public long getId() {
+    public int getId() {
         return id;
     }
 
-    public void setId(long id) {
+    public void setId(int id) {
         this.id = id;
     }
 

@@ -17,7 +17,7 @@ import com.yetwish.contactsdemo.widget.indexer.ISectionIndexer;
 import java.util.List;
 
 /**
- * 联系人列表adapter  todo cb  adapter与sectionIndexer 装饰者模式
+ * 联系人列表adapter 代理 todo 编辑
  * Created by yetwish on 2016/9/6.
  */
 public class ContactsListAdapter extends BaseAdapter implements SectionIndexer {

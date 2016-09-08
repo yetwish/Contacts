@@ -7,6 +7,8 @@ import com.yetwish.contactsdemo.model.Contacts;
 import java.util.List;
 
 /**
+ * 联系人索引表接口，继承{@link SectionIndexer}
+ * 添加一个方法，当数据方法变化时更新索引信息。
  * Created by yetwish on 2016/9/7.
  */
 public interface ISectionIndexer<T extends Contacts>  extends SectionIndexer{

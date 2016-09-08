@@ -12,7 +12,7 @@ import android.widget.SectionIndexer;
 import com.yetwish.contactsdemo.R;
 
 /**
- * 右边索引表
+ * 右边索引栏
  * Created by yetwish on 2016/9/6.
  */
 public class IndexScroller implements IIndexScroller {
@@ -57,6 +57,7 @@ public class IndexScroller implements IIndexScroller {
         getStatusBarHeight();
     }
 
+    //获取statusBar的高度
     private void getStatusBarHeight() {
         //获取status_bar_height资源的ID
         int resourceId = mContext.getResources().getIdentifier("status_bar_height", "dimen", "android");
@@ -99,7 +100,7 @@ public class IndexScroller implements IIndexScroller {
         mPreviewSize = mPreviewPadding * 2 + mPreviewTextHeight;
     }
 
-    //todo
+    //todo 参数是否为null 判断
     @Override
     public void setSectionIndexer(SectionIndexer indexer) {
         mIndexer = indexer;
@@ -183,7 +184,7 @@ public class IndexScroller implements IIndexScroller {
     private void drawPreview(Canvas canvas) {
         //draw bg
         canvas.drawRect(mPreviewRectF, mPreviewBgPaint);
-        //draw preview text  ???todo
+        //draw preview text  ???todo 文本高度计算不对
         canvas.drawText(mSections[mCurIndex], mPreviewRectF.centerX() - mPreviewTextPaint.measureText(mSections[mCurIndex]) / 2,
                 mPreviewRectF.centerY() - mPreviewTextHeight / 2 + mPreviewSize / 2, mPreviewTextPaint);
     }

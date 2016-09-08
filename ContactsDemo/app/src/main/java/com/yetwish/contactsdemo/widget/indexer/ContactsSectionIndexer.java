@@ -1,10 +1,6 @@
 package com.yetwish.contactsdemo.widget.indexer;
 
 
-import android.view.View;
-import android.view.ViewGroup;
-import android.widget.BaseAdapter;
-
 import com.yetwish.contactsdemo.model.Contacts;
 
 import java.util.Arrays;
@@ -12,18 +8,24 @@ import java.util.Collections;
 import java.util.List;
 
 /**
+ * 联系人索引表实现类，存储索引信息，提供索引方法
  * Created by yetwish on 2016/9/7.
  */
-public class ContactsSectionIndexer extends BaseAdapter implements ISectionIndexer<Contacts> {
+public class ContactsSectionIndexer implements ISectionIndexer<Contacts> {
 
-    //默认索引
+    //默认索引表
     private static final String DEFAULT_SECTIONS[] =
             {"#", "A", "B", "C", "D", "E", "F", "G", "H",
                     "I", "J", "K", "L", "M", "N", "O", "P", "Q",
                     "R", "S", "T", "U", "V", "W", "X", "Y", "Z"};
 
-    private List<Contacts> mContactsList;
-    private int mPositions[];
+    private List<Contacts> mContactsList; //联系人列表
+
+    private int mPositions[]; //存储每个section对应listView的起始位置
+
+    /**
+     * section列表，默认使用{@link ContactsSectionIndexer#DEFAULT_SECTIONS}为索引表
+     */
     private String mSections[];
 
     public ContactsSectionIndexer(List<Contacts> contacts) {
@@ -51,7 +53,9 @@ public class ContactsSectionIndexer extends BaseAdapter implements ISectionIndex
         return mPositions[sectionIndex];
     }
 
-
+    /**
+     * 根据联系人列表建立索引 TODO  Positions[]的算法 不适用于所有sections
+     */
     private void updateFirstItemAndPosition() {
         if (mContactsList.size() <= 1) return;
         //根据sortedKey排序
@@ -72,12 +76,12 @@ public class ContactsSectionIndexer extends BaseAdapter implements ISectionIndex
                 count++;
         }
         sectionCounts[preFirstChar] = count;
-
+        //获取positions
         int i = count = 0;
         do {
             count += sectionCounts[mSections[i++].charAt(0)];
             mPositions[i] = count;
-        } while (i < mSections.length - 1);
+        } while (i < mSections.length - 1); //todo 有问题
     }
 
     @Override
@@ -89,30 +93,11 @@ public class ContactsSectionIndexer extends BaseAdapter implements ISectionIndex
         return index >= 0 ? index : -index - 2;
     }
 
-
+    // TODO: 2016/9/8 可进行优化，数据改变时只针对改变的数据进行更新
     @Override
     public void notifyDataChanged(List<Contacts> contacts) {
         mContactsList = contacts;
         updateFirstItemAndPosition();
     }
 
-    @Override
-    public int getCount() {
-        return 0;
-    }
-
-    @Override
-    public Object getItem(int position) {
-        return null;
-    }
-
-    @Override
-    public long getItemId(int position) {
-        return 0;
-    }
-
-    @Override
-    public View getView(int position, View convertView, ViewGroup parent) {
-        return null;
-    }
 }

@@ -20,6 +20,11 @@
         <activity
             android:label="@string/detail_title"
             android:name=".ContactsDetailActivity"/>
+
+        <provider
+            android:authorities="com.yetwish.contactsdemo.provider.ContactsProvider"
+            android:name=".provider.ContactsProvider"
+            android:exported="true"/>
     </application>
 
 </manifest>
