@@ -11,7 +11,7 @@ public class Contacts implements Comparable<Contacts> {
     private int id;
     private String name;
     private List<String> phoneNumber;
-    private String sortedKey;
+    private String sortKey;
     private boolean isFirst;
 
     public Contacts() {
@@ -21,8 +21,12 @@ public class Contacts implements Comparable<Contacts> {
         this.id = id;
         this.name = name;
         this.phoneNumber = phoneNumber;
-        this.sortedKey = sortedKey.toUpperCase();
+        this.sortKey = sortedKey;
         this.isFirst = isFirst;
+    }
+
+    public Contacts(int id, String name, List<String> phoneNumber) {
+        this(id, name, phoneNumber, null, false);
     }
 
     public int getId() {
@@ -49,12 +53,12 @@ public class Contacts implements Comparable<Contacts> {
         this.phoneNumber = phoneNumber;
     }
 
-    public String getSortedKey() {
-        return sortedKey;
+    public String getSortKey() {
+        return sortKey;
     }
 
-    public void setSortedKey(String sortedKey) {
-        this.sortedKey = sortedKey;
+    public void setSortKey(String sortKey) {
+        this.sortKey = sortKey;
     }
 
     public boolean isFirst() {
@@ -67,6 +71,6 @@ public class Contacts implements Comparable<Contacts> {
 
     @Override
     public int compareTo(Contacts another) {
-        return this.sortedKey.compareTo(another.sortedKey);
+        return this.sortKey.compareTo(another.sortKey);
     }
 }

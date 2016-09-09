@@ -64,7 +64,7 @@ public class ContactsListAdapter extends BaseAdapter implements SectionIndexer {
         if (mData.get(position).isFirst()) {
             holder.tvSections.setVisibility(View.VISIBLE);
             holder.line.setVisibility(View.GONE);
-            holder.tvSections.setText((mData.get(position).getSortedKey().substring(0,1)).toUpperCase());
+            holder.tvSections.setText((mData.get(position).getSortKey().substring(0,1)).toUpperCase());
         }
         else{
             holder.tvSections.setVisibility(View.GONE);

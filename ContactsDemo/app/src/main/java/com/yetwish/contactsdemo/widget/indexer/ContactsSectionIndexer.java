@@ -61,12 +61,12 @@ public class ContactsSectionIndexer implements ISectionIndexer<Contacts> {
         //根据sortedKey排序
         Collections.sort(mContactsList);
         //获取第一个preFirstChar,方便循环对比
-        char preFirstChar = mContactsList.get(0).getSortedKey().charAt(0);
+        char preFirstChar = mContactsList.get(0).getSortKey().charAt(0);
         mContactsList.get(0).setFirst(true);
         int sectionCounts[] = new int[128]; //记录每个字母对应的contacts个数 128: 字母最大ascii 为122-'z';
         int count = 1;
         for (int i = 1; i < mContactsList.size(); i++) {
-            char firstChar = mContactsList.get(i).getSortedKey().charAt(0);
+            char firstChar = mContactsList.get(i).getSortKey().charAt(0);
             if (firstChar != preFirstChar) {
                 sectionCounts[preFirstChar] = count;
                 preFirstChar = firstChar;
@@ -80,8 +80,11 @@ public class ContactsSectionIndexer implements ISectionIndexer<Contacts> {
         int i = count = 0;
         do {
             count += sectionCounts[mSections[i++].charAt(0)];
-            mPositions[i] = count;
-        } while (i < mSections.length - 1); //todo 有问题
+            if (sectionCounts[mSections[i].charAt(0)] != 0)
+                mPositions[i] =  count;
+            else
+                mPositions[i] = mPositions[i - 1];
+        } while (i < mSections.length - 1);
     }
 
     @Override

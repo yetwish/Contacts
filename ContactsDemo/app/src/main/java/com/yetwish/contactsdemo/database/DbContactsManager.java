@@ -6,7 +6,8 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 
 import com.yetwish.contactsdemo.model.Contacts;
-import com.yetwish.contactsdemo.utils.ContactsUtil;
+import com.yetwish.contactsdemo.utils.ContactsUtils;
+import com.yetwish.contactsdemo.utils.JsonUtils;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -41,8 +42,8 @@ public class DbContactsManager {
                 Contacts contacts = new Contacts();
                 contacts.setId(cursor.getInt(cursor.getColumnIndex("id")));
                 contacts.setName(cursor.getString(cursor.getColumnIndex("name")));
-                contacts.setPhoneNumber(ContactsUtil.convertJson2List(cursor.getString(cursor.getColumnIndex("phoneNumber"))));
-                contacts.setSortedKey(cursor.getString(cursor.getColumnIndex("sortedKey")));
+                contacts.setPhoneNumber(JsonUtils.listFromJson(cursor.getString(cursor.getColumnIndex("phoneNumber")),String.class));
+                contacts.setSortKey(cursor.getString(cursor.getColumnIndex("sortKey")));
                 contacts.setFirst(false);
                 contactsList.add(contacts);
             }
@@ -85,11 +86,11 @@ public class DbContactsManager {
      */
     public long insert(Contacts contacts) {
 //        mDb.execSQL("INSERT INTO contacts VALUES(null, ?, ?, ?)",
-//                new Object[]{contacts.getName(), ContactsUtil.convertList2Jsop(contacts.getPhoneNumber()), contacts.getSortedKey()});
+//                new Object[]{contacts.getName(), ContactsUtils.toJson(contacts.getPhoneNumber()), contacts.getSortKey()});
         ContentValues values = new ContentValues();
         values.put("name", contacts.getName());
-        values.put("phoneNumber", ContactsUtil.convertList2Jsop(contacts.getPhoneNumber()));
-        values.put("sortedKey", contacts.getSortedKey());
+        values.put("phoneNumber", JsonUtils.toJson(contacts.getPhoneNumber()));
+        values.put("sortKey", contacts.getSortKey());
         return insert(null, values);
     }
 
@@ -130,8 +131,8 @@ public class DbContactsManager {
     public int update(Contacts contacts) {
         ContentValues values = new ContentValues();
         values.put("name", contacts.getName());
-        values.put("phoneNumber", ContactsUtil.convertList2Jsop(contacts.getPhoneNumber()));
-        values.put("sortedKey", contacts.getSortedKey());
+        values.put("phoneNumber", JsonUtils.toJson(contacts.getPhoneNumber()));
+        values.put("sortKey", contacts.getSortKey());
         return update(contacts.getId(), values);
     }
 

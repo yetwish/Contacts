@@ -15,11 +15,11 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     private static final int DATABASE_VERSION = 1;
 
     //todo varchar长度
-    private static final String CREATE_CONTACTS = "CREATE TABLE IF NOT EXIST contacts("
+    private static final String CREATE_CONTACTS = "CREATE TABLE IF NOT EXISTS contacts("
             + " id INTEGER PRIMARY KEY AUTOINCREMENT, "
             + " name VARCHAR NOT NULL, "
             + " phoneNumber VARCHAR, "//用json格式存储
-            + " sortedKey VARCHAR )";
+            + " sortKey VARCHAR )";
 
 
     public DatabaseHelper(Context context) {
