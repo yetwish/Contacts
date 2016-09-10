@@ -14,7 +14,7 @@ import com.yetwish.contactsdemo.widget.indexer.ISectionIndexer;
 import com.yetwish.contactsdemo.widget.indexer.IndexScroller;
 
 /**
- * 联系人列表ListView
+ * 联系人列表ListView todo scrollbar
  * Created by yetwish on 2016/9/3.
  */
 public class ContactsListView extends ListView {

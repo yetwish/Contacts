@@ -25,7 +25,10 @@ public class ContactsUtils {
         if (!isChineseOrAlpha(name.charAt(0)))
             sb.append("#");
         for (int i = 0; i < name.length(); i++) {
-            sb.append(Pinyin.toPinyin(name.charAt(i)));
+            if (Pinyin.isChinese(name.charAt(i)))
+                sb.append(Pinyin.toPinyin(name.charAt(i)));
+            else
+                sb.append(Character.toUpperCase(name.charAt(i)));
         }
         contacts.setSortKey(sb.toString());
     }

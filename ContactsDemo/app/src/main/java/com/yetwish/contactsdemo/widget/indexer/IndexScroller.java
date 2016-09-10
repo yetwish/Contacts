@@ -127,6 +127,8 @@ public class IndexScroller implements IIndexScroller {
                 if (isScroll) {
                     //move多次调用，当获取到index与mCurIndex不同时才需要通知listView.setSelection()
                     int tempIndex = obtainIndexByPosition(event.getY());
+                    if (tempIndex >= mSections.length) tempIndex = mSections.length - 1; //todo
+                    if (tempIndex < 0) tempIndex = 0;
                     if (mCurIndex != tempIndex) {
                         mCurIndex = tempIndex;
                         notifyCurIndexChanged();
@@ -170,7 +172,7 @@ public class IndexScroller implements IIndexScroller {
     //draw indexBar
     private void drawIndexBar(Canvas canvas) {
         //draw bg
-        if(isScroll){
+        if (isScroll) {
             canvas.drawRect(mIndexRectF, mIndexBgPaint);
         }
         //draw sections

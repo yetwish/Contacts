@@ -14,6 +14,7 @@ import com.yetwish.contactsdemo.widget.indexer.ContactsSectionIndexer;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Random;
 
 public class ContactsListActivity extends AppCompatActivity {
 
@@ -60,6 +61,36 @@ public class ContactsListActivity extends AppCompatActivity {
 //        mContactsDataList.add(new Contacts(1, "vivo大大", null, "vivodada", false));
 
         mContactsDataList.add(new Contacts(1, "叶桂", null));
+        mContactsDataList.add(new Contacts(1, "11马浪凯", null));
+        mContactsDataList.add(new Contacts(1, "12陈丽霞", null));
+        mContactsDataList.add(new Contacts(1, "12邵剑锋", null));
+        mContactsDataList.add(new Contacts(1, "13严雷", null));
+        mContactsDataList.add(new Contacts(1, "%A叶浩", null));
+        mContactsDataList.add(new Contacts(1, "ABC", null));
+        mContactsDataList.add(new Contacts(1, "Beyond", null));
+        mContactsDataList.add(new Contacts(1, "尘世", null));
+        mContactsDataList.add(new Contacts(1, "段浪", null));
+        mContactsDataList.add(new Contacts(1, "芬姐", null));
+        mContactsDataList.add(new Contacts(1, "黄Sir", null));
+        mContactsDataList.add(new Contacts(1, "胡椒", null));
+        mContactsDataList.add(new Contacts(1, "凯越", null));
+        mContactsDataList.add(new Contacts(1, "川哥", null));
+        mContactsDataList.add(new Contacts(1, "陆公", null));
+        mContactsDataList.add(new Contacts(1, "淘客", null));
+        mContactsDataList.add(new Contacts(1, "隔壁老王", null));
+        mContactsDataList.add(new Contacts(1, "万大爷", null));
+        mContactsDataList.add(new Contacts(1, "喜羊羊", null));
+        mContactsDataList.add(new Contacts(1, "灰太狼", null));
+        mContactsDataList.add(new Contacts(1, "小哥", null));
+        mContactsDataList.add(new Contacts(1, "无邪", null));
+        mContactsDataList.add(new Contacts(1, "嘻嘻", null));
+        mContactsDataList.add(new Contacts(1, "杨过", null));
+        mContactsDataList.add(new Contacts(1, "尹少", null));
+        mContactsDataList.add(new Contacts(1, "猿分", null));
+        mContactsDataList.add(new Contacts(1, "袁飞", null));
+        mContactsDataList.add(new Contacts(1, "周飞", null));
+        mContactsDataList.add(new Contacts(1, "智障", null));
+        mContactsDataList.add(new Contacts(1, "猪", null));
         mContactsDataList.add(new Contacts(1, "温凯文", null));
         mContactsDataList.add(new Contacts(1, "周子翔", null));
         mContactsDataList.add(new Contacts(1, "11程瑞", null));
@@ -81,17 +112,23 @@ public class ContactsListActivity extends AppCompatActivity {
         mContactsDataList.add(new Contacts(1, "李小龙", null));
         mContactsDataList.add(new Contacts(1, "妈妈", null));
         mContactsDataList.add(new Contacts(1, "牛牛", null));
+        mContactsDataList.add(new Contacts(1, "奶奶", null));
+        mContactsDataList.add(new Contacts(1, "舒雅", null));
+        mContactsDataList.add(new Contacts(1, "宿舍老大", null));
+        mContactsDataList.add(new Contacts(1, "亲戚儿子", null));
         mContactsDataList.add(new Contacts(1, "vivo", null));
         mContactsDataList.add(new Contacts(1, "vivo大大", null));
         mContactsAdapter = new ContactsListAdapter(this, mContactsDataList);
 
-        List<String> phoneList = Arrays.asList(new String[]{"18729900796","18565656939"});
+
+        List<String> phoneList = Arrays.asList(new String[]{"18729900796", "18565656939"});
         String json;
 //        mContactsDataList.get(0).setPhoneNumber(phoneList);
-        for(Contacts contacts : mContactsDataList){
-            contacts.setPhoneNumber(phoneList);
+        for (Contacts contacts : mContactsDataList) {
+//            phoneList = Arrays.asList(new String[]{getPhoneNumber(), getPhoneNumber()});
+//            contacts.setPhoneNumber(phoneList);
             ContactsUtils.updateSortKey(contacts);
-            json = JsonUtils.toJson(contacts);
+//            json = JsonUtils.toJson(contacts);
 //            phoneList = JsonUtils.listFromJson(json,String.class);
         }
 
@@ -99,5 +136,9 @@ public class ContactsListActivity extends AppCompatActivity {
 
     }
 
+    private String getPhoneNumber() {
+
+        return "185" + Math.round(Math.random() * 100000000);
+    }
 
 }
