@@ -10,7 +10,6 @@ import android.widget.ListView;
 import android.widget.SectionIndexer;
 
 import com.yetwish.contactsdemo.widget.indexer.IIndexScroller;
-import com.yetwish.contactsdemo.widget.indexer.ISectionIndexer;
 import com.yetwish.contactsdemo.widget.indexer.IndexScroller;
 
 /**
@@ -39,6 +38,8 @@ public class ContactsListView extends ListView {
         }
     }
 
+
+
     @Override
     public boolean onTouchEvent(MotionEvent ev) {
         return mIndexScroller != null && mIndexScroller.onTouchEvent(ev) || super.onTouchEvent(ev);
@@ -64,4 +65,6 @@ public class ContactsListView extends ListView {
             mIndexScroller.onSizeChanged(width, height, oldWidth, oldHeight);
         }
     }
+
+
 }

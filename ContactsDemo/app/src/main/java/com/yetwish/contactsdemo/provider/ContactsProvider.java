@@ -32,8 +32,10 @@ public class ContactsProvider extends ContentProvider {
 
     @Override
     public boolean onCreate() {
-        if (mDbManager == null)
-            mDbManager = new DbContactsManager(getContext());
+        if (mDbManager == null) { //todo? provider创建时间比application#oncreate()调用早
+            mDbManager = DbContactsManager.getInstance();
+            mDbManager.init(getContext().getApplicationContext());
+        }
         return true;
     }
 

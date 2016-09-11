@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:visibility="gone"
+    android:background="@color/colorSections">
+
+    <TextView
+        android:id="@+id/tvContactsEmpty"
+        android:textColor="@color/colorText"
+        android:background="@color/colorWhite"
+        android:paddingLeft="@dimen/item_list_padding_horizontal"
+        android:textSize="@dimen/main_text_size"
+        android:gravity="center_vertical"
+        android:text="@string/contacts_load"
+        android:layout_marginTop="@dimen/item_sections_height"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/item_list_height" />
+
+    <TextView
+        android:textColor="@color/colorSubText"
+        android:textSize="@dimen/empty_text_size"
+        android:layout_centerInParent="true"
+        android:text="@string/contacts_empty"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content" />
+
+</RelativeLayout>

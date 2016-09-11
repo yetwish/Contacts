@@ -2,6 +2,7 @@ package com.yetwish.contactsdemo.utils;
 
 import android.os.Environment;
 
+import com.yetwish.contactsdemo.ApiCallback;
 import com.yetwish.contactsdemo.model.Contacts;
 
 import java.io.BufferedReader;
@@ -75,13 +76,18 @@ public class FileUtils {
         return format.format(cal.getTime()) + FILE_EXTENSION;
     }
 
-    // TODO: 2016/9/9 搜索的范围
-    public List<File> listContactsFile() {
+    // TODO: 2016/9/9 搜索的范围 在子线程中搜索 多线程？
+    public void listContactsFile(ApiCallback<List<String>> callback) {
         if (mContactsFiles == null)
             mContactsFiles = new ArrayList<>();
+        mContactsFiles.clear();
         File rootFile = new File(getFilePath());
         searchContactsFile(rootFile);
-        return mContactsFiles;
+        List<String> fileNames = new ArrayList<>(mContactsFiles.size());
+        for(File file : mContactsFiles){
+            fileNames.add(file.getName());
+        }
+        callback.onSuccess(fileNames);
     }
 
     /**

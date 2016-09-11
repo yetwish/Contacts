@@ -4,9 +4,12 @@ import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+import android.os.Handler;
+import android.os.HandlerThread;
 
+import com.yetwish.contactsdemo.ApiCallback;
+import com.yetwish.contactsdemo.BaseApplication;
 import com.yetwish.contactsdemo.model.Contacts;
-import com.yetwish.contactsdemo.utils.ContactsUtils;
 import com.yetwish.contactsdemo.utils.JsonUtils;
 
 import java.util.ArrayList;
@@ -18,12 +21,35 @@ import java.util.List;
  */
 public class DbContactsManager {
 
+    private static DbContactsManager sInstance;
+
+    public static DbContactsManager getInstance() {
+        if (sInstance == null) {
+            synchronized (DbContactsManager.class) {
+                if (sInstance == null) {
+                    sInstance = new DbContactsManager();
+                }
+            }
+        }
+        return sInstance;
+    }
+
     private DatabaseHelper mHelper;
     private SQLiteDatabase mDb;
+    private Handler mDbHandler;
+    private HandlerThread mDbThread;
 
-    public DbContactsManager(Context context) {
+    private DbContactsManager() {
+    }
+
+    public void init(Context context){
         mHelper = new DatabaseHelper(context);
         mDb = mHelper.getWritableDatabase();
+        if (mDbThread == null) {
+            mDbThread = new HandlerThread("Db-Thread");
+            mDbThread.start();
+            mDbHandler = new Handler(mDbThread.getLooper());
+        }
     }
 
     /**
@@ -31,27 +57,37 @@ public class DbContactsManager {
      *
      * @return
      */
-    public List<Contacts> query() {
-        List<Contacts> contactsList = new ArrayList<>();
-        Cursor cursor = null;
-        try {
-            cursor = query(null, null, null, null); //检索整个表格
-            if (cursor == null) return null; //todo 是否需要进行null判定
-            cursor.moveToFirst();
-            while (cursor.moveToNext()) {
-                Contacts contacts = new Contacts();
-                contacts.setId(cursor.getInt(cursor.getColumnIndex("id")));
-                contacts.setName(cursor.getString(cursor.getColumnIndex("name")));
-                contacts.setPhoneNumber(JsonUtils.listFromJson(cursor.getString(cursor.getColumnIndex("phoneNumber")),String.class));
-                contacts.setSortKey(cursor.getString(cursor.getColumnIndex("sortKey")));
-                contacts.setFirst(false);
-                contactsList.add(contacts);
+    public void query(final ApiCallback<List<Contacts>> callback) {
+        final List<Contacts> contactsList = new ArrayList<>();
+        mDbHandler.post(new Runnable() {
+            @Override
+            public void run() {
+                Cursor cursor = null;
+                try {
+                    cursor = query(null, null, null, null); //检索整个表格
+                    if (cursor == null) {
+                        callback.onFailed("Something wrong");
+                        return;
+                    }
+                    cursor.moveToFirst();
+                    while (cursor.moveToNext()) {
+                        Contacts contacts = new Contacts();
+                        contacts.setId(cursor.getInt(cursor.getColumnIndex("id")));
+                        contacts.setName(cursor.getString(cursor.getColumnIndex("name")));
+                        contacts.setPhoneNumber(JsonUtils.listFromJson(cursor.getString(cursor.getColumnIndex("phoneNumber")), String.class));
+                        contacts.setSortKey(cursor.getString(cursor.getColumnIndex("sortKey")));
+                        contacts.setFirst(false);
+                        contactsList.add(contacts);
+                    }
+                    callback.onSuccess(contactsList);
+                } finally {
+                    if (cursor != null)
+                        cursor.close();
+                }
             }
-        } finally {
-            if (cursor != null)
-                cursor.close();
-        }
-        return contactsList;
+        });
+
+
     }
 
     /**
@@ -138,6 +174,7 @@ public class DbContactsManager {
 
     /**
      * 更新一条记录
+     *
      * @param id
      * @param values
      * @return updateRow
@@ -183,7 +220,13 @@ public class DbContactsManager {
      * 关闭database
      */
     public void closeDb() {
-        mDb.close();
+        if(mDb != null)
+            mDb.close();
+        if (mDbThread != null) {
+            mDbThread.quit();
+            mDbHandler = null;
+            mDbThread = null;
+        }
     }
 
 

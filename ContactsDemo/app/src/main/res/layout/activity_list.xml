@@ -11,4 +11,7 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"/>
 
+    <include layout="@layout/contacts_empty_view"
+        android:id="@+id/contacts_empty_view"/>
+
 </RelativeLayout>

@@ -8,6 +8,8 @@
 
     <dimen name="indexer_text_size">15sp</dimen>
     <dimen name="indexer_preview_text_size">40sp</dimen>
+    <dimen name="empty_text_size">35sp</dimen>
+    <dimen name="main_text_size">18sp</dimen>
 
 
 
