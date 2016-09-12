@@ -24,6 +24,18 @@ public class BingoThread {
 		}
 	}
 
+	public void start(Callable<?> callable){
+		start(callable, null);
+	}
+
+	public void start(Callable<?> callable,Callback callback){
+		if(!mStarted){
+			mCallable = callable;
+			ThreadRunner.getInstance().start(mCallable,callback);
+			mStarted = true;
+		}
+	}
+
 	public void cancel(boolean mayInterruptIfRunning) {
 		ThreadRunner.getInstance().cancelTask(mCallable, mayInterruptIfRunning);
 	}

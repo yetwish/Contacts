@@ -27,6 +27,9 @@
             android:name=".ContactsDetailActivity"
             android:label="@string/detail_title" />
 
+        <activity android:name=".ContactsLoadActivity"
+            android:label="@string/contacts_load_title"/>
+
         <provider
             android:name=".provider.ContactsProvider"
             android:authorities="com.yetwish.contactsdemo.provider.ContactsProvider"

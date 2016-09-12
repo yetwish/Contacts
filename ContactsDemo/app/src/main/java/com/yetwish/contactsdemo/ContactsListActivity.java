@@ -1,5 +1,6 @@
 package com.yetwish.contactsdemo;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -8,12 +9,10 @@ import android.view.View;
 import com.yetwish.contactsdemo.database.DbContactsManager;
 import com.yetwish.contactsdemo.model.Contacts;
 import com.yetwish.contactsdemo.utils.ContactsUtils;
-import com.yetwish.contactsdemo.utils.FileUtils;
 import com.yetwish.contactsdemo.widget.ContactsListAdapter;
 import com.yetwish.contactsdemo.widget.ContactsListView;
 import com.yetwish.contactsdemo.widget.indexer.ContactsSectionIndexer;
 
-import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -56,24 +55,25 @@ public class ContactsListActivity extends BaseActivity {
         emptyView.findViewById(R.id.tvContactsEmpty).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                showProgressDialog(getString(R.string.contacts_find));
-                FileUtils.getInstance().listContactsFile(new ApiCallback<List<String>>() {
-                    @Override
-                    public void onSuccess(List<String> fileNames) {
-                        hideProgressDialog();
-                        showListDialog(fileNames,getString(R.string.contacts_choice),null);
-                    }
-
-                    @Override
-                    public void onFailed(String msg) {
-                        hideProgressDialog();
-                    }
-                });
+                Intent intent = new Intent(ContactsListActivity.this, ContactsLoadActivity.class);
+                startActivityForResult(intent, ContactsLoadActivity.REQUEST_CODE);
             }
         });
         mAdapter = new ContactsListAdapter(this, mDataList);
         mListView.setAdapter(mAdapter);
         mAdapter.setSectionIndexer(new ContactsSectionIndexer(mDataList));
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if(requestCode == ContactsLoadActivity.REQUEST_CODE){
+            if(resultCode == RESULT_OK){
+                //load
+
+
+            }
+        }
     }
 
     @Override

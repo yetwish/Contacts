@@ -1,9 +1,13 @@
 package com.yetwish.contactsdemo.utils;
 
+import android.os.AsyncTask;
 import android.os.Environment;
+import android.os.Handler;
+import android.os.Message;
 
 import com.yetwish.contactsdemo.ApiCallback;
 import com.yetwish.contactsdemo.model.Contacts;
+import com.yetwish.contactsdemo.thread.ThreadFactory;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
@@ -19,6 +23,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
+import java.util.concurrent.Callable;
 
 /**
  * todo
@@ -76,18 +81,25 @@ public class FileUtils {
         return format.format(cal.getTime()) + FILE_EXTENSION;
     }
 
-    // TODO: 2016/9/9 搜索的范围 在子线程中搜索 多线程？
-    public void listContactsFile(ApiCallback<List<String>> callback) {
-        if (mContactsFiles == null)
-            mContactsFiles = new ArrayList<>();
-        mContactsFiles.clear();
-        File rootFile = new File(getFilePath());
-        searchContactsFile(rootFile);
-        List<String> fileNames = new ArrayList<>(mContactsFiles.size());
-        for(File file : mContactsFiles){
-            fileNames.add(file.getName());
-        }
-        callback.onSuccess(fileNames);
+    // TODO: 2016/9/9 搜索的范围
+    public void listContactsFile(final ApiCallback<List<File>> callback) {
+        new AsyncTask<Void, Void, List<File>>() {
+            @Override
+            protected List<File> doInBackground(Void... params) {
+                if (mContactsFiles == null)
+                    mContactsFiles = new ArrayList<>();
+                mContactsFiles.clear();
+                File rootFile = new File(getFilePath());
+                searchContactsFile(rootFile);
+                return mContactsFiles;
+            }
+
+            @Override
+            protected void onPostExecute(List<File> result) {
+                super.onPostExecute(result);
+                callback.onSuccess(result);
+            }
+        }.execute();
     }
 
     /**
