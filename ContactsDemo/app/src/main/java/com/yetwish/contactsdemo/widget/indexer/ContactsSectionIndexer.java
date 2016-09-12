@@ -2,6 +2,7 @@ package com.yetwish.contactsdemo.widget.indexer;
 
 
 import com.yetwish.contactsdemo.model.Contacts;
+import com.yetwish.contactsdemo.utils.ContactsUtils;
 
 import java.util.Arrays;
 import java.util.Collections;
@@ -26,21 +27,18 @@ public class ContactsSectionIndexer implements ISectionIndexer<Contacts> {
     /**
      * section列表，默认使用{@link ContactsSectionIndexer#DEFAULT_SECTIONS}为索引表
      */
-    private String mSections[];
+    private String mSections[]; //sections[] 与sectionIndexer强相关，目前算法不通用。无法实现sections[]可定制
+
+//    public ContactsSectionIndexer(List<Contacts> contacts,String[] sections) {}
 
     public ContactsSectionIndexer(List<Contacts> contacts) {
-        this(contacts, DEFAULT_SECTIONS);
-    }
-
-    public ContactsSectionIndexer(List<Contacts> contacts, String sections[]) {
         if (contacts == null)
             throw new NullPointerException("contacts cannot be null!");
         mContactsList = contacts;
-        mSections = sections;
+        mSections = DEFAULT_SECTIONS;
         mPositions = new int[mSections.length];
         updateFirstItemAndPosition();
     }
-
 
     @Override
     public String[] getSections() {
@@ -54,11 +52,14 @@ public class ContactsSectionIndexer implements ISectionIndexer<Contacts> {
     }
 
     /**
-     * 根据联系人列表建立索引 TODO  Positions[]的算法 不适用于所有sections
+     * 根据联系人列表建立索引
      */
     private void updateFirstItemAndPosition() {
         if (mContactsList.size() <= 1) return;
-        //根据sortedKey排序
+        for(Contacts contacts: mContactsList){ //获取sortKey
+            ContactsUtils.updateSortKey(contacts);
+        }
+        //根据sortKey排序
         Collections.sort(mContactsList);
         //获取第一个preFirstChar,方便循环对比
         char preFirstChar = mContactsList.get(0).getSortKey().charAt(0);
@@ -97,9 +98,9 @@ public class ContactsSectionIndexer implements ISectionIndexer<Contacts> {
     }
 
     // TODO: 2016/9/8 可进行优化，数据改变时只针对改变的数据进行更新
+    // 增删改都需要进行更新
     @Override
-    public void notifyDataChanged(List<Contacts> contacts) {
-        mContactsList = contacts;
+    public void notifyDataChanged() {
         updateFirstItemAndPosition();
     }
 

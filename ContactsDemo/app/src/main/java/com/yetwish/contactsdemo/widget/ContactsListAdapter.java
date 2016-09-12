@@ -6,6 +6,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.CheckBox;
+import android.widget.CompoundButton;
 import android.widget.SectionIndexer;
 import android.widget.TextView;
 
@@ -14,7 +15,10 @@ import com.yetwish.contactsdemo.model.Contacts;
 import com.yetwish.contactsdemo.widget.indexer.ContactsSectionIndexer;
 import com.yetwish.contactsdemo.widget.indexer.ISectionIndexer;
 
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * 联系人列表adapter 代理 todo 编辑
@@ -25,10 +29,14 @@ public class ContactsListAdapter extends BaseAdapter implements SectionIndexer {
     private Context mContext;
     private List<Contacts> mData;
     private ISectionIndexer mIndexer;
+    private Map<Integer, Boolean> mCbMap; //position -> isChecked
+    private boolean mCbVisible = false;
 
     public ContactsListAdapter(Context context, List<Contacts> data) {
         this.mContext = context;
         this.mData = data;
+        this.mIndexer = new ContactsSectionIndexer(mData);
+        this.mCbMap = new HashMap<>();
     }
 
     @Override
@@ -47,7 +55,7 @@ public class ContactsListAdapter extends BaseAdapter implements SectionIndexer {
     }
 
     @Override
-    public View getView(int position, View convertView, ViewGroup parent) {
+    public View getView(final int position, View convertView, ViewGroup parent) {
         ViewHolder holder = null;
         if (convertView == null) {
             holder = new ViewHolder();
@@ -57,6 +65,12 @@ public class ContactsListAdapter extends BaseAdapter implements SectionIndexer {
             holder.tvName = (TextView) convertView.findViewById(R.id.tvContactsItem);
             holder.line = convertView.findViewById(R.id.lineItem);
             convertView.setTag(holder);
+            holder.cbSelect.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+                @Override
+                public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                    mCbMap.put(position, isChecked);
+                }
+            });
         } else
             holder = (ViewHolder) convertView.getTag();
 
@@ -64,51 +78,57 @@ public class ContactsListAdapter extends BaseAdapter implements SectionIndexer {
         if (mData.get(position).isFirst()) {
             holder.tvSections.setVisibility(View.VISIBLE);
             holder.line.setVisibility(View.GONE);
-            holder.tvSections.setText((mData.get(position).getSortKey().substring(0,1)).toUpperCase());
-        }
-        else{
+            holder.tvSections.setText((mData.get(position).getSortKey().substring(0, 1)).toUpperCase());
+        } else {
             holder.tvSections.setVisibility(View.GONE);
             holder.line.setVisibility(View.VISIBLE);
         }
 
+        if (mCbVisible) {
+            holder.cbSelect.setVisibility(View.VISIBLE);
+            holder.cbSelect.setChecked(mCbMap.get(position));
+        } else
+            holder.cbSelect.setVisibility(View.GONE);
         return convertView;
     }
 
-    public void setSectionIndexer(ISectionIndexer indexer) {
-        mIndexer = indexer;
+    public void setCbVisible(boolean visible) {
+        if (mCbVisible != visible) {
+            mCbVisible = visible;
+            this.notifyDataSetInvalidated(); //需要重新getView todo
+        }
+    }
+
+    public List<Contacts> getCheckedContacts() {
+        List<Contacts> checkedContacts = new ArrayList<>();
+        for (Map.Entry<Integer, Boolean> entry : mCbMap.entrySet()) {
+            if (entry.getValue()) {
+                checkedContacts.add(mData.get(entry.getKey()));
+            }
+        }
+        return checkedContacts;
     }
 
     @Override
     public String[] getSections() {
-        checkSectionIndexerNotNull();
         return (String[]) mIndexer.getSections();
     }
 
     @Override
     public int getPositionForSection(int sectionIndex) {
-        checkSectionIndexerNotNull();
         return mIndexer.getPositionForSection(sectionIndex);
     }
 
     @Override
     public int getSectionForPosition(int position) {
-        checkSectionIndexerNotNull();
         return mIndexer.getSectionForPosition(position);
     }
 
 
-    private void checkSectionIndexerNotNull() {
-        if (mIndexer == null) {
-            mIndexer = new ContactsSectionIndexer(mData);
-        }
-    }
-
     @Override
     public void notifyDataSetChanged() {
         super.notifyDataSetChanged();
-        if(mIndexer != null){
-            mIndexer.notifyDataChanged(mData);
-        }
+        mIndexer.notifyDataChanged();
     }
 
     private class ViewHolder {

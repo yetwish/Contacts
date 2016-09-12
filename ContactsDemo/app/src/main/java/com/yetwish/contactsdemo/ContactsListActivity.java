@@ -61,7 +61,6 @@ public class ContactsListActivity extends BaseActivity {
         });
         mAdapter = new ContactsListAdapter(this, mDataList);
         mListView.setAdapter(mAdapter);
-        mAdapter.setSectionIndexer(new ContactsSectionIndexer(mDataList));
     }
 
     @Override
