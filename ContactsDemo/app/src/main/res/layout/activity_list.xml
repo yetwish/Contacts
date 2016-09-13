@@ -3,15 +3,32 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".ContactsListActivity">
+    tools:context=".activities.ContactsListActivity">
 
     <com.yetwish.contactsdemo.widget.ContactsListView
         android:id="@+id/lvContactsList"
-        android:divider="@null"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"/>
+        android:layout_height="match_parent"
+        android:layout_marginTop="@dimen/search_view_height"
+        android:divider="@null" />
 
-    <include layout="@layout/contacts_empty_view"
-        android:id="@+id/contacts_empty_view"/>
+    <com.yetwish.contactsdemo.widget.search.CustomSearchView
+        android:id="@+id/svContactsSearch"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
+
+    <!--&lt;!&ndash;遮罩层，阻塞listView 事件&ndash;&gt;-->
+    <!--<View-->
+        <!--android:id="@+id/frameLayer"-->
+        <!--android:visibility="gone"-->
+        <!--android:background="@color/colorBlackAlpha"-->
+        <!--android:layout_below="@id/svContactsSearch"-->
+        <!--android:onClick="onFrameLayerClick"-->
+        <!--android:layout_width="match_parent"-->
+        <!--android:layout_height="match_parent"/>-->
+
+    <include
+        android:id="@+id/contacts_empty_view"
+        layout="@layout/contacts_empty_view" />
 
 </RelativeLayout>

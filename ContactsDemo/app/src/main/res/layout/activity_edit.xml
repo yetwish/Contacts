@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    tools:context=".activities.ContactsListActivity">
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignBottom="@+id/etContactsName"
+            android:layout_toLeftOf="@id/etContactsName"
+            android:layout_marginRight="@dimen/item_list_margin"
+            android:src="@mipmap/ic_launcher" />
+
+        <EditText
+            android:id="@+id/etContactsName"
+            android:layout_width="wrap_content"
+            android:layout_height="@dimen/item_list_height"
+            android:layout_centerHorizontal="true"
+            android:layout_marginBottom="@dimen/margin_bottom"
+            android:layout_marginTop="@dimen/margin_top"
+            android:hint="@string/contacts_name_hint"
+            android:gravity="center"
+            android:textColor="@color/colorText"
+            android:textSize="@dimen/main_text_size" />
+
+        <ImageButton
+            android:id="@+id/ibAddPhoneNumber"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignBaseline="@+id/etContactsName"
+            android:layout_alignParentRight="true"
+            android:layout_marginRight="20dp"
+            android:background="@null"
+            android:src="@android:drawable/ic_input_add" />
+
+        <LinearLayout
+            android:id="@+id/llContactsPhone"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/etContactsName"
+            android:orientation="vertical"
+            android:paddingLeft="20dp"
+            android:paddingRight="20dp"/>
+
+    </RelativeLayout>
+</ScrollView>

@@ -6,10 +6,12 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Handler;
 import android.os.HandlerThread;
+import android.os.Looper;
+import android.support.annotation.NonNull;
 
 import com.yetwish.contactsdemo.ApiCallback;
-import com.yetwish.contactsdemo.BaseApplication;
 import com.yetwish.contactsdemo.model.Contacts;
+import com.yetwish.contactsdemo.utils.ContactsUtils;
 import com.yetwish.contactsdemo.utils.JsonUtils;
 
 import java.util.ArrayList;
@@ -39,10 +41,12 @@ public class DbContactsManager {
     private Handler mDbHandler;
     private HandlerThread mDbThread;
 
+    private Handler mMainHandler;
+
     private DbContactsManager() {
     }
 
-    public void init(Context context){
+    public void init(Context context) {
         mHelper = new DatabaseHelper(context);
         mDb = mHelper.getWritableDatabase();
         if (mDbThread == null) {
@@ -50,6 +54,7 @@ public class DbContactsManager {
             mDbThread.start();
             mDbHandler = new Handler(mDbThread.getLooper());
         }
+        mMainHandler = new Handler(Looper.getMainLooper());
     }
 
     /**
@@ -57,7 +62,7 @@ public class DbContactsManager {
      *
      * @return
      */
-    public void query(final ApiCallback<List<Contacts>> callback) {
+    public void query(@NonNull final ApiCallback<List<Contacts>> callback) {
         final List<Contacts> contactsList = new ArrayList<>();
         mDbHandler.post(new Runnable() {
             @Override
@@ -72,22 +77,64 @@ public class DbContactsManager {
                     cursor.moveToFirst();
                     while (cursor.moveToNext()) {
                         Contacts contacts = new Contacts();
-                        contacts.setId(cursor.getInt(cursor.getColumnIndex("id")));
+                        contacts.setId(cursor.getInt(cursor.getColumnIndex("_id")));
                         contacts.setName(cursor.getString(cursor.getColumnIndex("name")));
                         contacts.setPhoneNumber(JsonUtils.listFromJson(cursor.getString(cursor.getColumnIndex("phoneNumber")), String.class));
                         contacts.setSortKey(cursor.getString(cursor.getColumnIndex("sortKey")));
+                        contacts.setSearchKey(cursor.getString(cursor.getColumnIndex("searchKey")));
                         contacts.setFirst(false);
                         contactsList.add(contacts);
                     }
-                    callback.onSuccess(contactsList);
+                    mMainHandler.post(new Runnable() {
+                        @Override
+                        public void run() {
+                            callback.onSuccess(contactsList);
+                        }
+                    });
                 } finally {
                     if (cursor != null)
                         cursor.close();
                 }
             }
         });
+    }
 
 
+    public void query(final int id, @NonNull final ApiCallback<Contacts> callback) {
+        if (callback == null)
+            throw new IllegalArgumentException("callback cannot be null");
+        mDbHandler.post(new Runnable() {
+            @Override
+            public void run() {
+                Cursor cursor = null;
+                try {
+                    cursor = query(id, null, null); //检索单条数据
+                    if (cursor == null) {
+                        callback.onFailed("Something wrong");
+                        return;
+                    }
+                    cursor.moveToFirst();
+                    final Contacts contacts = new Contacts();
+                    if (cursor.moveToNext()) {
+                        contacts.setId(cursor.getInt(cursor.getColumnIndex("_id")));
+                        contacts.setName(cursor.getString(cursor.getColumnIndex("name")));
+                        contacts.setPhoneNumber(JsonUtils.listFromJson(cursor.getString(cursor.getColumnIndex("phoneNumber")), String.class));
+                        contacts.setSortKey(cursor.getString(cursor.getColumnIndex("sortKey")));
+                        contacts.setSearchKey(cursor.getString(cursor.getColumnIndex("searchKey")));
+                        contacts.setFirst(false);
+                    }
+                    mMainHandler.post(new Runnable() {
+                        @Override
+                        public void run() {
+                            callback.onSuccess(contacts);
+                        }
+                    });
+                } finally {
+                    if (cursor != null)
+                        cursor.close();
+                }
+            }
+        });
     }
 
     /**
@@ -111,7 +158,21 @@ public class DbContactsManager {
      */
     public Cursor query(int id, String[] projection, String sortOrder) {
 
-        return query(projection, "id = ?", new String[]{String.valueOf(id)}, sortOrder);
+        return query(projection, "_id = ?", new String[]{String.valueOf(id)}, sortOrder);
+    }
+
+    /**
+     * 搜索匹配
+     *
+     * @param searchKey
+     * @param projection
+     * @param sortOrder
+     * @return
+     */
+    public Cursor query(String searchKey, String[] projection, String sortOrder) {
+
+        return query(projection, "searchKey like ? or sortKey like ? or phoneNumber like ? or name like ?",
+                new String[]{"%" + searchKey + "%", "%" + searchKey + "%", "%" + searchKey + "%", "%" + searchKey + "%"}, sortOrder);
     }
 
     /**
@@ -123,10 +184,13 @@ public class DbContactsManager {
     public long insert(Contacts contacts) {
 //        mDb.execSQL("INSERT INTO contacts VALUES(null, ?, ?, ?)",
 //                new Object[]{contacts.getName(), ContactsUtils.toJson(contacts.getPhoneNumber()), contacts.getSortKey()});
+        //获取sortKey
+        ContactsUtils.updateSortKey(contacts);
         ContentValues values = new ContentValues();
         values.put("name", contacts.getName());
         values.put("phoneNumber", JsonUtils.toJson(contacts.getPhoneNumber()));
         values.put("sortKey", contacts.getSortKey());
+        values.put("searchKey", contacts.getSearchKey());
         return insert(null, values);
     }
 
@@ -165,10 +229,13 @@ public class DbContactsManager {
      * @return updateRow
      */
     public int update(Contacts contacts) {
+        //更新sortKey
+        ContactsUtils.updateSortKey(contacts);
         ContentValues values = new ContentValues();
         values.put("name", contacts.getName());
         values.put("phoneNumber", JsonUtils.toJson(contacts.getPhoneNumber()));
         values.put("sortKey", contacts.getSortKey());
+        values.put("searchKey", contacts.getSearchKey());
         return update(contacts.getId(), values);
     }
 
@@ -180,7 +247,7 @@ public class DbContactsManager {
      * @return updateRow
      */
     public int update(int id, ContentValues values) {
-        return update(values, "id = ?", new String[]{String.valueOf(id)});
+        return update(values, "_id = ?", new String[]{String.valueOf(id)});
     }
 
     /**
@@ -202,7 +269,7 @@ public class DbContactsManager {
      * @return deletedRow
      */
     public int delete(int id) {
-        return delete("id = ?", new String[]{String.valueOf(id)});
+        return delete("_id = ?", new String[]{String.valueOf(id)});
     }
 
     /**
@@ -220,7 +287,7 @@ public class DbContactsManager {
      * 关闭database
      */
     public void closeDb() {
-        if(mDb != null)
+        if (mDb != null)
             mDb.close();
         if (mDbThread != null) {
             mDbThread.quit();

@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:paddingLeft="@dimen/item_list_padding_horizontal"
+    android:paddingRight="@dimen/item_list_padding_horizontal"
+    android:orientation="vertical"
+    android:layout_height="55dp">
+    <TextView
+        android:layout_weight="1"
+        android:layout_marginTop="@dimen/item_list_margin"
+        android:textColor="@color/colorText"
+        android:id="@+id/tvSearchName"
+        android:gravity="center_vertical"
+        android:text="11程瑞"
+        android:textSize="@dimen/main_text_size"
+        android:layout_width="match_parent"
+        android:layout_height="0dp" />
+
+    <TextView
+        android:textColor="@color/colorSubText"
+        android:text="18729900796"
+        android:layout_marginBottom="2dp"
+        android:id="@+id/tvSearchPhone"
+        android:textSize="@dimen/item_text_size"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content" />
+
+    <View
+        style="@style/SeparatorStyle"/>
+</LinearLayout>

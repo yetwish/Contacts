@@ -15,8 +15,10 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
         <activity
-            android:name=".ContactsListActivity"
-            android:label="@string/contacts_title">
+            android:name=".activities.ContactsListActivity"
+            android:label="@string/contacts_title"
+            android:windowSoftInputMode="adjustPan|stateHidden">
+            android:screenOrientation="portrait">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
@@ -24,11 +26,14 @@
         </activity>
 
         <activity
-            android:name=".ContactsDetailActivity"
+            android:name=".activities.ContactsDetailActivity"
             android:label="@string/detail_title" />
 
-        <activity android:name=".ContactsLoadActivity"
+        <activity android:name=".activities.ContactsLoadActivity"
             android:label="@string/contacts_load_title"/>
+
+        <activity android:name=".activities.ContactsEditActivity"
+            android:label="@string/contacts_edit_title"/>
 
         <provider
             android:name=".provider.ContactsProvider"

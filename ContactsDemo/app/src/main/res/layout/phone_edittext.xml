@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content">
+
+    <EditText
+        android:id="@+id/etPhone"
+        android:layout_width="wrap_content"
+        android:layout_height="@dimen/item_list_height"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="@dimen/item_margin_top"
+        android:gravity="center"
+        android:hint="@string/contacts_phone_hint"
+        android:inputType="number"
+        android:textColor="@color/colorText"
+        android:textSize="@dimen/main_text_size" />
+
+    <ImageView
+        android:layout_alignParentRight="true"
+        android:layout_centerVertical="true"
+        android:id="@+id/ivDelete"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:src="@android:drawable/ic_delete" />
+
+
+</RelativeLayout>
+

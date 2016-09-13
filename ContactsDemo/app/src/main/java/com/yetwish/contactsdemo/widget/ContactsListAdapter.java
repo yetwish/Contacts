@@ -6,7 +6,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.CheckBox;
-import android.widget.CompoundButton;
 import android.widget.SectionIndexer;
 import android.widget.TextView;
 
@@ -55,7 +54,7 @@ public class ContactsListAdapter extends BaseAdapter implements SectionIndexer {
     }
 
     @Override
-    public View getView(final int position, View convertView, ViewGroup parent) {
+    public View getView(final int position, View convertView, final ViewGroup parent) {
         ViewHolder holder = null;
         if (convertView == null) {
             holder = new ViewHolder();
@@ -65,12 +64,6 @@ public class ContactsListAdapter extends BaseAdapter implements SectionIndexer {
             holder.tvName = (TextView) convertView.findViewById(R.id.tvContactsItem);
             holder.line = convertView.findViewById(R.id.lineItem);
             convertView.setTag(holder);
-            holder.cbSelect.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-                @Override
-                public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                    mCbMap.put(position, isChecked);
-                }
-            });
         } else
             holder = (ViewHolder) convertView.getTag();
 
@@ -84,27 +77,63 @@ public class ContactsListAdapter extends BaseAdapter implements SectionIndexer {
             holder.line.setVisibility(View.VISIBLE);
         }
 
-        if (mCbVisible) {
-            holder.cbSelect.setVisibility(View.VISIBLE);
+
+        if (mCbMap.containsKey(position))
             holder.cbSelect.setChecked(mCbMap.get(position));
-        } else
+        else
+            holder.cbSelect.setChecked(false);
+
+        if (mCbVisible)
+            holder.cbSelect.setVisibility(View.VISIBLE);
+        else
             holder.cbSelect.setVisibility(View.GONE);
         return convertView;
+    }
+
+    public boolean isCbVisible() {
+        return mCbVisible;
     }
 
     public void setCbVisible(boolean visible) {
         if (mCbVisible != visible) {
             mCbVisible = visible;
-            this.notifyDataSetInvalidated(); //需要重新getView todo
+            if (!visible) mCbMap.clear();
+            this.notifyDataSetInvalidated(); //需要重新getView
         }
     }
 
+    /**
+     * todo 优化
+     *
+     * @param position
+     */
+    public void onCbClick(int position) {
+        if (mCbMap.containsKey(position))
+            mCbMap.remove(position);
+        else
+            mCbMap.put(position, true);
+        notifyDataSetInvalidated();
+    }
+
+    /**
+     * 全选和反选
+     */
+    public void onAllCbClick() {
+        if (mCbMap.size() != mData.size()) {
+            for (int i = 0; i < mData.size(); i++) {
+                mCbMap.put(i, true);
+            }
+        } else {
+            mCbMap.clear();
+        }
+        notifyDataSetChanged();
+    }
+
     public List<Contacts> getCheckedContacts() {
+        if (mCbMap.size() == 0) return null;
         List<Contacts> checkedContacts = new ArrayList<>();
         for (Map.Entry<Integer, Boolean> entry : mCbMap.entrySet()) {
-            if (entry.getValue()) {
-                checkedContacts.add(mData.get(entry.getKey()));
-            }
+            checkedContacts.add(mData.get(entry.getKey()));
         }
         return checkedContacts;
     }

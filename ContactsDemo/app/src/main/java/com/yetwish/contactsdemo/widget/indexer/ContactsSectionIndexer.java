@@ -52,14 +52,15 @@ public class ContactsSectionIndexer implements ISectionIndexer<Contacts> {
     }
 
     /**
+     * 数据源已经获取过sortKey
      * 根据联系人列表建立索引
      */
     private void updateFirstItemAndPosition() {
         if (mContactsList.size() <= 1) return;
-        for(Contacts contacts: mContactsList){ //获取sortKey
+        //根据sortKey排序
+        for(Contacts contacts : mContactsList){  // TODO: 2016/9/13
             ContactsUtils.updateSortKey(contacts);
         }
-        //根据sortKey排序
         Collections.sort(mContactsList);
         //获取第一个preFirstChar,方便循环对比
         char preFirstChar = mContactsList.get(0).getSortKey().charAt(0);

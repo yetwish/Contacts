@@ -1,13 +1,17 @@
-package com.yetwish.contactsdemo;
+package com.yetwish.contactsdemo.activities;
 
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 
+import com.yetwish.contactsdemo.ApiCallback;
+import com.yetwish.contactsdemo.BaseActivity;
+import com.yetwish.contactsdemo.R;
 import com.yetwish.contactsdemo.utils.FileUtils;
 
 import java.io.File;
@@ -19,7 +23,7 @@ import java.util.List;
  */
 public class ContactsLoadActivity extends BaseActivity {
 
-    public static final int REQUEST_CODE = 0x01;
+    public static final int REQUEST_CODE = 1;
 
     public static final String EXTRA_FILE = "EXTRA_FILE";
 
@@ -36,6 +40,7 @@ public class ContactsLoadActivity extends BaseActivity {
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_load);
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         mIntent = getIntent();
         initViews();
         searchContactsFile();
@@ -50,7 +55,7 @@ public class ContactsLoadActivity extends BaseActivity {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 mIntent.putExtra(EXTRA_FILE, mFiles.get(position));
-                setResult(RESULT_OK);
+                setResult(RESULT_OK,mIntent);
                 finish();
             }
         });
@@ -58,7 +63,7 @@ public class ContactsLoadActivity extends BaseActivity {
 
     private void searchContactsFile() {
         showProgressDialog(getString(R.string.contacts_find));
-        FileUtils.getInstance().listContactsFile(new ApiCallback<List<File>>() {
+        FileUtils.listContactsFile(new ApiCallback<List<File>>() {
             @Override
             public void onSuccess(List<File> files) {
                 hideProgressDialog();
@@ -74,6 +79,17 @@ public class ContactsLoadActivity extends BaseActivity {
                 hideProgressDialog();
             }
         });
+    }
+
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case android.R.id.home:
+                finish();
+                break;
+        }
+        return super.onOptionsItemSelected(item);
     }
 
 

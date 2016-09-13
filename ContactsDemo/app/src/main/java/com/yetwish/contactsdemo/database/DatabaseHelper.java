@@ -16,10 +16,11 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
     //todo varchar长度
     private static final String CREATE_CONTACTS = "CREATE TABLE IF NOT EXISTS contacts("
-            + " id INTEGER PRIMARY KEY AUTOINCREMENT, "
+            + " _id INTEGER PRIMARY KEY AUTOINCREMENT, "
             + " name VARCHAR NOT NULL, "
             + " phoneNumber VARCHAR, "//用json格式存储
-            + " sortKey VARCHAR )";
+            + " sortKey VARCHAR, " //一级索引关键字
+            + " searchKey VARCHAR )"; //search 关键字
 
 
     public DatabaseHelper(Context context) {
@@ -33,7 +34,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
-        db.execSQL("DROP TABLE IF EXIST contacts");
+        db.execSQL("DROP TABLE IF EXISTS contacts");
         onCreate(db);
     }
 

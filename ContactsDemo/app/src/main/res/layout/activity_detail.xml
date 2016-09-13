@@ -3,14 +3,29 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:paddingBottom="@dimen/activity_vertical_margin"
-    android:paddingLeft="@dimen/activity_horizontal_margin"
-    android:paddingRight="@dimen/activity_horizontal_margin"
-    android:paddingTop="@dimen/activity_vertical_margin"
-    tools:context=".ContactsListActivity">
+    tools:context=".activities.ContactsListActivity">
 
     <TextView
+        android:id="@+id/tvContactsName"
+        android:background="@null"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Hello World!" />
+        android:layout_height="@dimen/item_list_height"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="@dimen/margin_top"
+        android:layout_marginBottom="@dimen/margin_bottom"
+        android:drawableLeft="@mipmap/ic_launcher"
+        android:drawablePadding="@dimen/item_list_margin"
+        android:gravity="center"
+        android:textColor="@color/colorText"
+        android:textSize="@dimen/main_text_size" />
+
+    <LinearLayout
+        android:id="@+id/llContactsPhone"
+        android:layout_below="@+id/tvContactsName"
+        android:orientation="vertical"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+    </LinearLayout>
+
+
 </RelativeLayout>

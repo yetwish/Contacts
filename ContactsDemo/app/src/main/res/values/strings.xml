@@ -2,21 +2,31 @@
     <string name="app_name">ContactsDemo</string>
     <string name="contacts_title">联系人</string>
     <string name="contacts_load_title">导入联系人</string>
+    <string name="contacts_edit_title">编辑联系人</string>
     <string name="detail_title">联系人详情</string>
     <string name="contacts_load">从本地导入</string>
     <string name="loading">正在加载</string>
     <string name="contacts_save">导出到手机</string>
     <string name="contacts_empty">无联系人</string>
+    <string name="search_empty">未找到联系人</string>
     <string name="contacts_find">正在搜索联系人数据</string>
     <string name="contacts_find_nothing">未找到联系人数据文件</string>
     <string name="contacts_choice">选择要导入的文件</string>
     <string name="contacts_loading">正在导入</string>
     <string name="contacts_saving">正在导出</string>
+    <string name="contacts_phone_hint">请输入电话号码</string>
+    <string name="contacts_name_hint">姓名</string>
     <string name="confirm">确定</string>
     <string name="cancel">取消</string>
 
+    <string name="contacts_search_hint">搜索联系人</string>
+
     <string name="menu_add">新建联系人</string>
     <string name="menu_edit">编辑</string>
+    <string name="menu_all">全选/反选</string>
+    <string name="menu_save">导出</string>
+    <string name="menu_delete">删除</string>
+    <string name="menu_finish">完成</string>
 
 
     <string-array name="testArray">

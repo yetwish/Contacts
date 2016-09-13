@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <LinearLayout
+        android:id="@+id/llSearchView"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/search_view_height"
+        android:orientation="horizontal"
+        android:padding="2dp">
+
+        <FrameLayout
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1">
+
+            <EditText
+                android:singleLine="true"
+                android:id="@+id/etSearchText"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:background="@drawable/search_edittext_shape"
+                android:drawableLeft="@android:drawable/ic_menu_search"
+                android:drawablePadding="@dimen/item_list_margin"
+                android:hint="@string/contacts_search_hint"
+                android:paddingRight="3dp" />
+
+            <ImageView
+                android:id="@+id/ivSearchClear"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center|right"
+                android:layout_marginRight="@dimen/item_list_margin"
+                android:src="@mipmap/search_clear_normal" />
+
+        </FrameLayout>
+
+        <Button
+            android:id="@+id/btnSearchCancel"
+            android:layout_width="50dp"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:background="@null"
+            android:text="@string/cancel"
+            android:textColor="@color/colorAccent"
+            android:textSize="16sp" />
+    </LinearLayout>
+
+    <!--遮罩层，阻塞listView 事件-->
+    <View
+        android:id="@+id/frameLayer"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_below="@+id/llSearchView"
+        android:background="@color/colorBlackAlpha"
+        android:visibility="gone"/>
+
+    <ListView
+        android:visibility="gone"
+        android:divider="@null"
+        android:layout_below="@id/llSearchView"
+        android:id="@+id/lvSearchResult"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"/>
+
+
+
+
+</RelativeLayout>

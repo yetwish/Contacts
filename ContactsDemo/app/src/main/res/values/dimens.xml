@@ -12,6 +12,10 @@
     <dimen name="main_text_size">18sp</dimen>
 
 
+    <dimen name="margin_top">50dp</dimen>
+    <dimen name="margin_bottom">30dp</dimen>
+    <dimen name="item_margin_top">10dp</dimen>
+
 
     <dimen name="item_list_height">60dp</dimen>
     <dimen name="item_sections_height">25dp</dimen>
@@ -19,5 +23,7 @@
     <dimen name="item_list_margin">8dp</dimen>
 
     <dimen name="item_text_size">16sp</dimen>
+
+    <dimen name="search_view_height">40dp</dimen>
 
 </resources>

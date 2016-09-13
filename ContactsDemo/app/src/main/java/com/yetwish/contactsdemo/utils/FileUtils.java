@@ -2,12 +2,11 @@ package com.yetwish.contactsdemo.utils;
 
 import android.os.AsyncTask;
 import android.os.Environment;
-import android.os.Handler;
-import android.os.Message;
+import android.support.annotation.NonNull;
 
 import com.yetwish.contactsdemo.ApiCallback;
+import com.yetwish.contactsdemo.database.DbContactsManager;
 import com.yetwish.contactsdemo.model.Contacts;
-import com.yetwish.contactsdemo.thread.ThreadFactory;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
@@ -23,7 +22,6 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
-import java.util.concurrent.Callable;
 
 /**
  * todo
@@ -37,33 +35,16 @@ public class FileUtils {
 
     private static final String FILE_EXTENSION = ".contacts.json";
 
-    private static FileUtils sFileUtils;
-
-    private FileFilter mFilter;
-    private List<File> mContactsFiles;
-
-    public static final FileUtils getInstance() {
-        if (sFileUtils == null) {
-            synchronized (FileUtils.class) {
-                if (sFileUtils == null)
-                    sFileUtils = new FileUtils();
-            }
+    private static FileFilter mFilter = new FileFilter() {
+        @Override
+        public boolean accept(File pathname) {
+            return pathname.getName().endsWith(FILE_EXTENSION) || pathname.isDirectory();
         }
-        return sFileUtils;
-    }
+    };
 
-    private FileUtils() {
-        mFilter = new FileFilter() {
-            @Override
-            public boolean accept(File pathname) {
-                if (pathname.getName().endsWith(FILE_EXTENSION) || pathname.isDirectory())
-                    return true;
-                return false;
-            }
-        };
-    }
+    private static List<File> mContactsFiles;
 
-    public String getFilePath() {
+    public static String getFilePath() {
         if (Environment.getExternalStorageState().equals(Environment.MEDIA_MOUNTED)) { //已挂载sdcard则放回sdcard路径
             return Environment.getExternalStorageDirectory() + SDCARD_DIR;
         } else //没有则返回context.getFilesDir().getPath()
@@ -75,14 +56,14 @@ public class FileUtils {
      *
      * @return
      */
-    private String getFileName() {
+    private static String getFileName() {
         Calendar cal = Calendar.getInstance();
         SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd_HH-mm-ss");
-        return format.format(cal.getTime()) + FILE_EXTENSION;
+        return format.format(cal.getTime());
     }
 
     // TODO: 2016/9/9 搜索的范围
-    public void listContactsFile(final ApiCallback<List<File>> callback) {
+    public static void listContactsFile(@NonNull final ApiCallback<List<File>> callback) {
         new AsyncTask<Void, Void, List<File>>() {
             @Override
             protected List<File> doInBackground(Void... params) {
@@ -97,7 +78,10 @@ public class FileUtils {
             @Override
             protected void onPostExecute(List<File> result) {
                 super.onPostExecute(result);
-                callback.onSuccess(result);
+                if (result.size() < 1)
+                    callback.onFailed("未找到联系人数据文件!");
+                else
+                    callback.onSuccess(result);
             }
         }.execute();
     }
@@ -107,7 +91,7 @@ public class FileUtils {
      *
      * @param file
      */
-    private void searchContactsFile(File file) {
+    private static void searchContactsFile(File file) {
         if (!file.exists())
             return;
         File files[] = file.listFiles(mFilter);
@@ -119,60 +103,109 @@ public class FileUtils {
         }
     }
 
-    public List<Contacts> loadContacts(String filePath, String fileName) {
-        BufferedReader reader = null;
-        List<Contacts> list = new ArrayList<Contacts>();
-        try {
-            reader = new BufferedReader(new InputStreamReader(new FileInputStream(filePath + fileName)));
-            String line;
-            while ((line = reader.readLine()) != null) {
-                list.add(JsonUtils.objFromJson(line, Contacts.class));
-            }
-            return list;
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
-            return null;
-        } catch (IOException e) {
-            e.printStackTrace();
-            return null;
-        } finally {
-            if (reader != null)
+    /**
+     * 异步加载
+     *
+     * @param file
+     * @param callback
+     */
+    public static void loadContacts(final File file, @NonNull final ApiCallback<List<Contacts>> callback) {
+        new AsyncTask<Void, Void, List<Contacts>>() {
+            @Override
+            protected List<Contacts> doInBackground(Void... params) {
+                BufferedReader reader = null;
+                List<Contacts> list = new ArrayList<Contacts>();
                 try {
-                    reader.close();
+                    reader = new BufferedReader(new InputStreamReader(new FileInputStream(file.getAbsolutePath())));
+                    String line;
+                    while ((line = reader.readLine()) != null) {
+                        list.add(JsonUtils.objFromJson(line, Contacts.class));
+                    }
+                    //保存到数据库
+                    DbContactsManager.getInstance().insert(list);
+                } catch (FileNotFoundException e) {
+                    e.printStackTrace();
                 } catch (IOException e) {
                     e.printStackTrace();
+                } finally {
+                    if (reader != null)
+                        try {
+                            reader.close();
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        }
                 }
-        }
+                return list;
+            }
+
+            @Override
+            protected void onPostExecute(List<Contacts> result) {
+                super.onPostExecute(result);
+                if (result.size() < 1)
+                    callback.onFailed("");
+                else
+                    callback.onSuccess(result);
+            }
+        }.execute();
+
     }
 
-    public void saveContacts(List<Contacts> list) {
-        BufferedWriter writer = null;
-        try {
-            String fileName = getFileName();
-            createFileIfNotExists(getFilePath(), fileName);
-            writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(getFilePath() + fileName, false)));
-            for (Contacts item : list) {
-                writer.write(JsonUtils.toJson(item));
-                writer.newLine();
-                writer.flush();//todo ??是否需要
-            }
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
-            e.printStackTrace();
-        } finally {
-            if (writer != null)
+    public static void saveContacts(List<Contacts> list, @NonNull ApiCallback<String> callback) {
+        saveContacts(list, getFileName(), callback);
+    }
+
+    /**
+     * 异步加载 todo 有问题
+     *
+     * @param list
+     * @param customFileName
+     * @param callback
+     */
+    public static void saveContacts(final List<Contacts> list, final String customFileName, @NonNull final ApiCallback<String> callback) {
+        if (customFileName == null) {
+            saveContacts(list, callback);
+            return;
+        }
+        new AsyncTask<Void, Void, String>() {
+            @Override
+            protected String doInBackground(Void... params) {
+                BufferedWriter writer = null;
+                String filePath = getFilePath();
+                String fileName = customFileName + FILE_EXTENSION;
+                File file = new File(filePath, fileName);
                 try {
-                    writer.close();
+                    createFileIfNotExists(file);
+                    writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(file, false)));
+                    for (Contacts item : list) {
+                        writer.write(JsonUtils.toJson(item));
+                        writer.newLine();
+                        writer.flush();//todo ??是否需要
+                    }
+                } catch (FileNotFoundException e) {
+                    e.printStackTrace();
                 } catch (IOException e) {
                     e.printStackTrace();
+                } finally {
+                    if (writer != null)
+                        try {
+                            writer.close();
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        }
                 }
-        }
+                return file.getAbsolutePath();
+            }
+
+            @Override
+            protected void onPostExecute(String s) {
+                super.onPostExecute(s);
+                callback.onSuccess(s);
+            }
+        }.execute();
     }
 
-    private void createFileIfNotExists(String filePath, String fileName) {
-        File path = new File(filePath);
-        File file = new File(filePath + fileName);
+    private static void createFileIfNotExists(File file) {
+        File path = new File(file.getParent());
         if (!path.exists()) {
             path.mkdirs();
         }
@@ -184,6 +217,5 @@ public class FileUtils {
             }
         }
     }
-
 
 }
