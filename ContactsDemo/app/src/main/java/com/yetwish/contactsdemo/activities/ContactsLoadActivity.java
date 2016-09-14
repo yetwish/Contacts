@@ -1,5 +1,7 @@
 package com.yetwish.contactsdemo.activities;
 
+import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
@@ -23,6 +25,11 @@ import java.util.List;
  * Created by yetwish on 2016/9/3.
  */
 public class ContactsLoadActivity extends BaseActivity {
+
+    public static void startActivityForResult(Activity context) {
+        Intent intent = new Intent(context, ContactsLoadActivity.class);
+        context.startActivityForResult(intent, REQUEST_CODE);
+    }
 
     public static final int REQUEST_CODE = 1;
 
@@ -56,7 +63,7 @@ public class ContactsLoadActivity extends BaseActivity {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 mIntent.putExtra(EXTRA_FILE, mFiles.get(position));
-                setResult(RESULT_OK,mIntent);
+                setResult(RESULT_OK, mIntent);
                 finish();
             }
         });

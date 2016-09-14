@@ -13,7 +13,7 @@
         android:paddingLeft="@dimen/item_list_padding_horizontal"
         android:textSize="@dimen/main_text_size"
         android:gravity="center_vertical"
-        android:text="@string/contacts_load"
+        android:text="@string/contacts_import"
         android:layout_marginTop="@dimen/item_sections_height"
         android:layout_width="match_parent"
         android:layout_height="@dimen/item_list_height" />

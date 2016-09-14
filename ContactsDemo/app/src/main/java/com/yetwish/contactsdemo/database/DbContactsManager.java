@@ -10,6 +10,7 @@ import android.os.Looper;
 import android.support.annotation.NonNull;
 
 import com.yetwish.contactsdemo.ApiCallback;
+import com.yetwish.contactsdemo.BaseApplication;
 import com.yetwish.contactsdemo.model.Contacts;
 import com.yetwish.contactsdemo.utils.ContactsUtils;
 import com.yetwish.contactsdemo.utils.JsonUtils;
@@ -44,6 +45,9 @@ public class DbContactsManager {
     private Handler mMainHandler;
 
     private DbContactsManager() {
+        if (BaseApplication.getInstance() != null) {
+            init(BaseApplication.getInstance());
+        }
     }
 
     public void init(Context context) {
@@ -70,11 +74,9 @@ public class DbContactsManager {
                 Cursor cursor = null;
                 try {
                     cursor = query(null, null, null, null); //检索整个表格
-                    if (cursor == null) {
-                        callback.onFailed("Something wrong");
+                    if (cursor == null || !cursor.moveToFirst()) {
                         return;
                     }
-                    cursor.moveToFirst();
                     do {
                         Contacts contacts = new Contacts();
                         contacts.setId(cursor.getInt(cursor.getColumnIndex("_id")));
@@ -109,10 +111,6 @@ public class DbContactsManager {
                 Cursor cursor = null;
                 try {
                     cursor = query(id, null, null); //检索单条数据
-                    if (cursor == null) {
-                        callback.onFailed("Something wrong");
-                        return;
-                    }
                     final Contacts contacts = new Contacts();
                     if (cursor.moveToFirst()) {
                         contacts.setId(cursor.getInt(cursor.getColumnIndex("_id")));
@@ -160,20 +158,6 @@ public class DbContactsManager {
     public Cursor query(int id, String[] projection, String sortOrder) {
 
         return query(projection, "_id = ?", new String[]{String.valueOf(id)}, sortOrder);
-    }
-
-    /**
-     * 搜索匹配
-     *
-     * @param searchKey
-     * @param projection
-     * @param sortOrder
-     * @return
-     */
-    public Cursor query(String searchKey, String[] projection, String sortOrder) {
-
-        return query(projection, "searchKey like ? or sortKey like ? or phoneNumber like ? or name like ?",
-                new String[]{"%" + searchKey + "%", "%" + searchKey + "%", "%" + searchKey + "%", "%" + searchKey + "%"}, sortOrder);
     }
 
     /**

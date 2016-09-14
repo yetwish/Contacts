@@ -63,7 +63,7 @@ public class ContactsEditActivity extends BaseActivity {
             showPhoneNumbers();
             getSupportActionBar().setTitle(R.string.contacts_edit_title);
         } else {
-            getSupportActionBar().setTitle(R.string.menu_add);
+            getSupportActionBar().setTitle(R.string.contacts_add_title);
             addPhoneView();
         }
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
@@ -132,6 +132,7 @@ public class ContactsEditActivity extends BaseActivity {
                 finish();
                 break;
             case android.R.id.home:
+                hideKeyBoard();
                 finish();
                 break;
 

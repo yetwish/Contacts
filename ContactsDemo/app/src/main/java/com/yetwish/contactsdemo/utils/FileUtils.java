@@ -112,7 +112,7 @@ public class FileUtils {
      * @param file
      * @param callback
      */
-    public static void loadContacts(final File file, @NonNull final ApiCallback<Void> callback) {
+    public static void importContacts(final File file, @NonNull final ApiCallback<Void> callback) {
         new AsyncTask<Void, Void, Boolean>() {
             @Override
             protected Boolean doInBackground(Void... params) {
@@ -156,8 +156,8 @@ public class FileUtils {
 
     }
 
-    public static void saveContacts(List<Contacts> list, @NonNull ApiCallback<String> callback) {
-        saveContacts(list, getFileName(), callback);
+    public static void exportContacts(List<Contacts> list, @NonNull ApiCallback<String> callback) {
+        exportContacts(list, getFileName(), callback);
     }
 
     /**
@@ -167,9 +167,9 @@ public class FileUtils {
      * @param customFileName
      * @param callback
      */
-    public static void saveContacts(final List<Contacts> list, final String customFileName, @NonNull final ApiCallback<String> callback) {
+    public static void exportContacts(final List<Contacts> list, final String customFileName, @NonNull final ApiCallback<String> callback) {
         if (customFileName == null || customFileName.trim().equals("")) {
-            saveContacts(list, callback);
+            exportContacts(list, callback);
             return;
         }
         new AsyncTask<Void, Void, String>() {

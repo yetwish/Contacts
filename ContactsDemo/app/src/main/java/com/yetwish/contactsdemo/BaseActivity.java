@@ -178,7 +178,7 @@ public class BaseActivity extends AppCompatActivity {
 
     @Override
     public void onBackPressed() {
-        if(hideBasicDialog()|| hideProgressDialog()|| hideInputDialog())
+        if (hideBasicDialog() || hideInputDialog())
             return;
         super.onBackPressed();
     }

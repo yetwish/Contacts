@@ -62,7 +62,8 @@ public class ContactsListAdapter extends BaseAdapter implements SectionIndexer {
             holder.tvSections = (TextView) convertView.findViewById(R.id.tvContactsSections);
             holder.cbSelect = (CheckBox) convertView.findViewById(R.id.cbContactsItem);
             holder.tvName = (TextView) convertView.findViewById(R.id.tvContactsItem);
-            holder.line = convertView.findViewById(R.id.lineItem);
+            holder.lineTop = convertView.findViewById(R.id.lineTop);
+            holder.lineBottom = convertView.findViewById(R.id.lineBottom);
             convertView.setTag(holder);
         } else
             holder = (ViewHolder) convertView.getTag();
@@ -70,12 +71,17 @@ public class ContactsListAdapter extends BaseAdapter implements SectionIndexer {
         holder.tvName.setText(mData.get(position).getName());
         if (mData.get(position).isFirst()) {
             holder.tvSections.setVisibility(View.VISIBLE);
-            holder.line.setVisibility(View.GONE);
+            holder.lineTop.setVisibility(View.GONE);
             holder.tvSections.setText((mData.get(position).getSortKey().substring(0, 1)).toUpperCase());
         } else {
             holder.tvSections.setVisibility(View.GONE);
-            holder.line.setVisibility(View.VISIBLE);
+            holder.lineTop.setVisibility(View.VISIBLE);
         }
+
+        if (position == getCount() - 1)
+            holder.lineBottom.setVisibility(View.VISIBLE);
+        else
+            holder.lineBottom.setVisibility(View.GONE);
 
 
         if (mCbMap.containsKey(position))
@@ -164,6 +170,7 @@ public class ContactsListAdapter extends BaseAdapter implements SectionIndexer {
         TextView tvSections;
         CheckBox cbSelect;
         TextView tvName;
-        View line;
+        View lineTop;
+        View lineBottom;
     }
 }

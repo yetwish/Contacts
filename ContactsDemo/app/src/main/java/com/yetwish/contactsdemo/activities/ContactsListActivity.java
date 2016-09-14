@@ -1,6 +1,7 @@
 package com.yetwish.contactsdemo.activities;
 
 import android.content.Intent;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.util.Log;
@@ -78,6 +79,8 @@ public class ContactsListActivity extends BaseActivity {
                 mDataList.clear();
                 mDataList.addAll(contactsList);
                 mAdapter.notifyDataSetChanged();
+                invalidateOptionsMenu();
+                hideProgressDialog();
             }
 
             @Override
@@ -124,8 +127,7 @@ public class ContactsListActivity extends BaseActivity {
         emptyView.findViewById(R.id.tvContactsEmpty).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent = new Intent(ContactsListActivity.this, ContactsLoadActivity.class);
-                startActivityForResult(intent, ContactsLoadActivity.REQUEST_CODE);
+                ContactsLoadActivity.startActivityForResult(ContactsListActivity.this);
             }
         });
 
@@ -153,11 +155,8 @@ public class ContactsListActivity extends BaseActivity {
                     @Override
                     public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
                         if (which.equals(DialogAction.POSITIVE)) {
-                            DbContactsManager.getInstance().delete((int) id);
-                            mDataList.remove(position);
-                            mAdapter.notifyDataSetChanged();
                             hideBasicDialog();
-                            showToastShort("删除成功");
+                            deleteContacts(position);
                         } else if (which.equals(DialogAction.NEGATIVE)) {
                             hideBasicDialog();
                         }
@@ -175,7 +174,8 @@ public class ContactsListActivity extends BaseActivity {
             if (resultCode == RESULT_OK) {
                 //load
                 File file = (File) data.getSerializableExtra(ContactsLoadActivity.EXTRA_FILE);
-                FileUtils.loadContacts(file, new ApiCallback<Void>() {
+                showProgressDialog(getString(R.string.contacts_importing));
+                FileUtils.importContacts(file, new ApiCallback<Void>() {
                     @Override
                     public void onSuccess(Void data) {
                         loadDataFromDb();
@@ -183,7 +183,8 @@ public class ContactsListActivity extends BaseActivity {
 
                     @Override
                     public void onFailed(String msg) {
-
+                        hideProgressDialog();
+                        showToastShort("导入数据失败，请重试");
                     }
                 });
             }
@@ -192,7 +193,9 @@ public class ContactsListActivity extends BaseActivity {
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        if (mAdapter != null && mAdapter.isCbVisible())
+        if (mAdapter.getCount() == 0)
+            this.getMenuInflater().inflate(R.menu.menu_contacts_empty, menu);
+        else if (mAdapter != null && mAdapter.isCbVisible())
             this.getMenuInflater().inflate(R.menu.menu_contacts_edit, menu);
         else
             this.getMenuInflater().inflate(R.menu.menu_contacts, menu);
@@ -217,13 +220,23 @@ public class ContactsListActivity extends BaseActivity {
                 mAdapter.onAllCbClick();
                 break;
 
+            case R.id.menu_cancel:
+                //取消
+                invalidateListView(false);
+                break;
+
+            case R.id.menu_import:
+                //导入
+                ContactsLoadActivity.startActivityForResult(ContactsListActivity.this);
+                break;
+
             case R.id.menu_save:
                 //导出
                 if (mAdapter.getCheckedContacts() != null) {
                     showInputDialog("导出联系人", "请输入文件名称，直接确定为默认", new MaterialDialog.InputCallback() {
                         @Override
                         public void onInput(@NonNull MaterialDialog dialog, CharSequence input) {
-                            FileUtils.saveContacts(mDataList, input.toString(), new ApiCallback<String>() {
+                            FileUtils.exportContacts(mDataList, input.toString(), new ApiCallback<String>() {
                                 @Override
                                 public void onSuccess(String data) {
                                     showToastLong("成功导出到" + data);
@@ -250,13 +263,8 @@ public class ContactsListActivity extends BaseActivity {
                         @Override
                         public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
                             if (which.equals(DialogAction.POSITIVE)) {
-                                for (Contacts contacts : mAdapter.getCheckedContacts()) {
-                                    mDataList.remove(contacts);
-                                    DbContactsManager.getInstance().delete(contacts.getId());
-                                }
-                                invalidateListView(false);
                                 hideBasicDialog();
-                                showToastShort("删除成功");
+                                deleteContacts(-1);
                             } else if (which.equals(DialogAction.NEGATIVE)) {
                                 hideBasicDialog();
                             }
@@ -269,6 +277,41 @@ public class ContactsListActivity extends BaseActivity {
         }
         return super.onOptionsItemSelected(item);
     }
+
+    private void deleteContacts(int position){
+        if(position != -1){
+            doDelete(mDataList.get(position));
+            mAdapter.notifyDataSetChanged();
+            showToastShort("删除成功");
+        }else {
+            showProgressDialog("正在删除");
+           new AsyncTask<Void, Void, Void>(){
+               @Override
+               protected Void doInBackground(Void... params) {
+                   //删除选中的
+                   for (Contacts contacts : mAdapter.getCheckedContacts()) {
+                       doDelete(contacts);
+                   }
+                   return null;
+               }
+
+               @Override
+               protected void onPostExecute(Void aVoid) {
+                   super.onPostExecute(aVoid);
+                   invalidateListView(false);
+                   hideProgressDialog();
+                   showToastShort("删除成功");
+               }
+           }.execute();
+        }
+
+    }
+
+    private void doDelete(Contacts contacts){
+        mDataList.remove(contacts);
+        DbContactsManager.getInstance().delete(contacts.getId());
+    }
+
 
     private void invalidateListView(boolean isCbVisible) {
         mAdapter.setCbVisible(isCbVisible);
@@ -283,7 +326,6 @@ public class ContactsListActivity extends BaseActivity {
     protected void onResume() {
         super.onResume();
         loadDataFromDb();
-
     }
 
     //当dialog show时不响应back press

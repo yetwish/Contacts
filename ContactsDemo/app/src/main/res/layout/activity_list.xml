@@ -17,17 +17,9 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content" />
 
-    <!--&lt;!&ndash;遮罩层，阻塞listView 事件&ndash;&gt;-->
-    <!--<View-->
-        <!--android:id="@+id/frameLayer"-->
-        <!--android:visibility="gone"-->
-        <!--android:background="@color/colorBlackAlpha"-->
-        <!--android:layout_below="@id/svContactsSearch"-->
-        <!--android:onClick="onFrameLayerClick"-->
-        <!--android:layout_width="match_parent"-->
-        <!--android:layout_height="match_parent"/>-->
 
     <include
+
         android:id="@+id/contacts_empty_view"
         layout="@layout/contacts_empty_view" />
 

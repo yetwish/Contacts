@@ -24,7 +24,7 @@
         android:paddingRight="@dimen/item_list_padding_horizontal">
 
         <View
-            android:id="@+id/lineItem"
+            android:id="@+id/lineTop"
             style="@style/SeparatorStyle"
             android:layout_alignParentTop="true" />
 
@@ -44,6 +44,11 @@
             android:layout_toRightOf="@id/cbContactsItem"
             android:text="hELLO!"
             android:textSize="@dimen/item_text_size" />
+        <View
+            android:visibility="gone"
+            android:id="@+id/lineBottom"
+            style="@style/SeparatorStyle"
+            android:layout_alignParentBottom="true" />
 
 
     </RelativeLayout>

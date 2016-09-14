@@ -35,10 +35,10 @@
         <activity android:name=".activities.ContactsEditActivity"
             android:label="@string/contacts_edit_title"/>
 
-        <provider
-            android:name=".provider.ContactsProvider"
-            android:authorities="com.yetwish.contactsdemo.provider.ContactsProvider"
-            android:exported="true"/>
+        <!--<provider-->
+            <!--android:name=".provider.ContactsProvider"-->
+            <!--android:authorities="com.yetwish.contactsdemo.provider.ContactsProvider"-->
+            <!--android:exported="true"/>-->
     </application>
 
 </manifest>

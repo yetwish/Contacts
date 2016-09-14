@@ -10,7 +10,7 @@ import android.support.annotation.Nullable;
 import com.yetwish.contactsdemo.database.DbContactsManager;
 
 /**
- * 联系人content provider
+ * 联系人content provider todo 应该将数据与应用放在两个project中
  * Created by yetwish on 2016/9/8.
  */
 public class ContactsProvider extends ContentProvider {

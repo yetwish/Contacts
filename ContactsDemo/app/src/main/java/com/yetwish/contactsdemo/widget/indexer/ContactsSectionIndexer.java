@@ -56,7 +56,11 @@ public class ContactsSectionIndexer implements ISectionIndexer<Contacts> {
      * 根据联系人列表建立索引
      */
     private void updateFirstItemAndPosition() {
-        if (mContactsList.size() <= 1) return;
+        if (mContactsList.size() <= 1) {
+            if (mContactsList.size() == 1)
+                mContactsList.get(0).setFirst(true);
+            return;
+        }
         //根据sortKey排序
         Collections.sort(mContactsList);
         //获取第一个preFirstChar,方便循环对比
@@ -80,7 +84,7 @@ public class ContactsSectionIndexer implements ISectionIndexer<Contacts> {
         do {
             count += sectionCounts[mSections[i++].charAt(0)];
             if (sectionCounts[mSections[i].charAt(0)] != 0)
-                mPositions[i] =  count;
+                mPositions[i] = count;
             else
                 mPositions[i] = mPositions[i - 1];
         } while (i < mSections.length - 1);
