@@ -58,9 +58,6 @@ public class ContactsSectionIndexer implements ISectionIndexer<Contacts> {
     private void updateFirstItemAndPosition() {
         if (mContactsList.size() <= 1) return;
         //根据sortKey排序
-        for(Contacts contacts : mContactsList){  // TODO: 2016/9/13
-            ContactsUtils.updateSortKey(contacts);
-        }
         Collections.sort(mContactsList);
         //获取第一个preFirstChar,方便循环对比
         char preFirstChar = mContactsList.get(0).getSortKey().charAt(0);

@@ -18,7 +18,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * 封装与database交互的方法 CRUD  todo 更新和添加可以合并 放到dbThread中执行
+ * 封装与database交互的方法 CRUD  todo 更新/插入/delete 是否需要放到dbThread中执行
  * Created by yetwish on 2016/9/8.
  */
 public class DbContactsManager {
@@ -75,7 +75,7 @@ public class DbContactsManager {
                         return;
                     }
                     cursor.moveToFirst();
-                    while (cursor.moveToNext()) {
+                    do {
                         Contacts contacts = new Contacts();
                         contacts.setId(cursor.getInt(cursor.getColumnIndex("_id")));
                         contacts.setName(cursor.getString(cursor.getColumnIndex("name")));
@@ -84,7 +84,7 @@ public class DbContactsManager {
                         contacts.setSearchKey(cursor.getString(cursor.getColumnIndex("searchKey")));
                         contacts.setFirst(false);
                         contactsList.add(contacts);
-                    }
+                    } while (cursor.moveToNext());
                     mMainHandler.post(new Runnable() {
                         @Override
                         public void run() {
@@ -113,9 +113,8 @@ public class DbContactsManager {
                         callback.onFailed("Something wrong");
                         return;
                     }
-                    cursor.moveToFirst();
                     final Contacts contacts = new Contacts();
-                    if (cursor.moveToNext()) {
+                    if (cursor.moveToFirst()) {
                         contacts.setId(cursor.getInt(cursor.getColumnIndex("_id")));
                         contacts.setName(cursor.getString(cursor.getColumnIndex("name")));
                         contacts.setPhoneNumber(JsonUtils.listFromJson(cursor.getString(cursor.getColumnIndex("phoneNumber")), String.class));
@@ -126,6 +125,8 @@ public class DbContactsManager {
                     mMainHandler.post(new Runnable() {
                         @Override
                         public void run() {
+                            if (contacts.getName() == null)
+                                callback.onSuccess(null);
                             callback.onSuccess(contacts);
                         }
                     });
@@ -179,19 +180,16 @@ public class DbContactsManager {
      * 添加一条记录
      *
      * @param contacts
-     * @return newInsertId  todo long? int
      */
-    public long insert(Contacts contacts) {
+    public void insert(Contacts contacts) {
 //        mDb.execSQL("INSERT INTO contacts VALUES(null, ?, ?, ?)",
 //                new Object[]{contacts.getName(), ContactsUtils.toJson(contacts.getPhoneNumber()), contacts.getSortKey()});
-        //获取sortKey
-        ContactsUtils.updateSortKey(contacts);
         ContentValues values = new ContentValues();
         values.put("name", contacts.getName());
         values.put("phoneNumber", JsonUtils.toJson(contacts.getPhoneNumber()));
         values.put("sortKey", contacts.getSortKey());
         values.put("searchKey", contacts.getSearchKey());
-        return insert(null, values);
+        insert(null, values);
     }
 
     /**
@@ -229,8 +227,6 @@ public class DbContactsManager {
      * @return updateRow
      */
     public int update(Contacts contacts) {
-        //更新sortKey
-        ContactsUtils.updateSortKey(contacts);
         ContentValues values = new ContentValues();
         values.put("name", contacts.getName());
         values.put("phoneNumber", JsonUtils.toJson(contacts.getPhoneNumber()));

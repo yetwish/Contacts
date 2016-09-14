@@ -8,8 +8,8 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
-import android.widget.Toast;
 
+import com.afollestad.materialdialogs.DialogAction;
 import com.afollestad.materialdialogs.MaterialDialog;
 import com.yetwish.contactsdemo.ApiCallback;
 import com.yetwish.contactsdemo.BaseActivity;
@@ -17,15 +17,20 @@ import com.yetwish.contactsdemo.R;
 import com.yetwish.contactsdemo.database.DbContactsManager;
 import com.yetwish.contactsdemo.model.Contacts;
 import com.yetwish.contactsdemo.utils.FileUtils;
+import com.yetwish.contactsdemo.utils.SPUtils;
 import com.yetwish.contactsdemo.widget.ContactsListAdapter;
 import com.yetwish.contactsdemo.widget.ContactsListView;
 import com.yetwish.contactsdemo.widget.search.CustomSearchView;
 import com.yetwish.contactsdemo.widget.search.ISearchListener;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * 联系人列表页面
+ */
 public class ContactsListActivity extends BaseActivity {
 
     private static final String TAG = ContactsListActivity.class.getSimpleName();
@@ -40,7 +45,30 @@ public class ContactsListActivity extends BaseActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_list);
+        firstInit();
         initViews();
+    }
+
+    /**
+     * app第一次启动时，将data数据写入到手机设备中
+     */
+    private void firstInit() {
+        if ((Boolean) SPUtils.getInstance().get(SPUtils.SP_FIRST_START, true))
+            try {
+                FileUtils.pushData2SDCard(getResources().getAssets().open(FileUtils.DEFAULT_DATA_FILE_NAME), new ApiCallback<Void>() {
+                    @Override
+                    public void onSuccess(Void data) {
+                        SPUtils.getInstance().put(SPUtils.SP_FIRST_START, false);
+                    }
+
+                    @Override
+                    public void onFailed(String msg) {
+                        // TODO: 2016/9/14 写入失败
+                    }
+                });
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
     }
 
     private void loadDataFromDb() {
@@ -79,9 +107,9 @@ public class ContactsListActivity extends BaseActivity {
             public void onQuitSearch(int id) {
                 mListView.setVisibility(View.VISIBLE);
                 hideKeyBoard();
-                if(id != NULL){//选中了
-                    for(Contacts contacts : mDataList){
-                        if(contacts.getId() == id){
+                if (id != NULL) {//选中了
+                    for (Contacts contacts : mDataList) {
+                        if (contacts.getId() == id) {
                             Intent intent = new Intent(ContactsListActivity.this, ContactsDetailActivity.class);
                             intent.putExtra(ContactsDetailActivity.EXTRA_CONTACTS, contacts);
                             startActivity(intent);
@@ -117,6 +145,27 @@ public class ContactsListActivity extends BaseActivity {
             }
         });
 
+        mListView.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
+            @Override
+            public boolean onItemLongClick(AdapterView<?> parent, View view, final int position, final long id) {
+                if (mAdapter.isCbVisible()) return false;
+                showBasicDialog("删除联系人", "确定要删除所选中的联系人吗？", new MaterialDialog.SingleButtonCallback() {
+                    @Override
+                    public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
+                        if (which.equals(DialogAction.POSITIVE)) {
+                            DbContactsManager.getInstance().delete((int) id);
+                            mDataList.remove(position);
+                            mAdapter.notifyDataSetChanged();
+                            hideBasicDialog();
+                            showToastShort("删除成功");
+                        } else if (which.equals(DialogAction.NEGATIVE)) {
+                            hideBasicDialog();
+                        }
+                    }
+                });
+                return true;
+            }
+        });
     }
 
     @Override
@@ -125,17 +174,16 @@ public class ContactsListActivity extends BaseActivity {
         if (requestCode == ContactsLoadActivity.REQUEST_CODE) {
             if (resultCode == RESULT_OK) {
                 //load
-                int a = 10 * 7 + 8;
                 File file = (File) data.getSerializableExtra(ContactsLoadActivity.EXTRA_FILE);
-                FileUtils.loadContacts(file, new ApiCallback<List<Contacts>>() {
+                FileUtils.loadContacts(file, new ApiCallback<Void>() {
                     @Override
-                    public void onSuccess(List<Contacts> data) {
-                        mDataList.addAll(data);
+                    public void onSuccess(Void data) {
+                        loadDataFromDb();
                     }
 
                     @Override
                     public void onFailed(String msg) {
-                        Log.e(TAG, msg);
+
                     }
                 });
             }
@@ -161,8 +209,7 @@ public class ContactsListActivity extends BaseActivity {
 
             case R.id.menu_edit:
                 //编辑
-                mAdapter.setCbVisible(true);
-                invalidateOptionsMenu();
+                invalidateListView(true);
                 break;
 
             case R.id.menu_all:
@@ -179,46 +226,71 @@ public class ContactsListActivity extends BaseActivity {
                             FileUtils.saveContacts(mDataList, input.toString(), new ApiCallback<String>() {
                                 @Override
                                 public void onSuccess(String data) {
-                                    Toast.makeText(ContactsListActivity.this, "成功导出到" + data, Toast.LENGTH_SHORT).show();
+                                    showToastLong("成功导出到" + data);
+                                    invalidateListView(false);
+                                    hideKeyBoard();
                                 }
 
                                 @Override
                                 public void onFailed(String msg) {
+                                    hideKeyBoard();
                                 }
                             });
                         }
                     });
                 } else
-                    Toast.makeText(this, "请选中要导出的联系人", Toast.LENGTH_SHORT).show();
+                    showToastShort("请选中要导出的联系人");
                 break;
 
             case R.id.menu_delete:
                 //删除
                 if (mAdapter.getCheckedContacts() != null) {
-                    for (Contacts contacts : mAdapter.getCheckedContacts()) {
-                        DbContactsManager.getInstance().delete(contacts.getId());
-                    }
-                    // TODO: 2016/9/12   删除完成需要视图变换
-                    mAdapter.notifyDataSetChanged();
+                    //showDialog
+                    showBasicDialog("删除联系人", "确定要删除所选中的联系人吗？", new MaterialDialog.SingleButtonCallback() {
+                        @Override
+                        public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
+                            if (which.equals(DialogAction.POSITIVE)) {
+                                for (Contacts contacts : mAdapter.getCheckedContacts()) {
+                                    mDataList.remove(contacts);
+                                    DbContactsManager.getInstance().delete(contacts.getId());
+                                }
+                                invalidateListView(false);
+                                hideBasicDialog();
+                                showToastShort("删除成功");
+                            } else if (which.equals(DialogAction.NEGATIVE)) {
+                                hideBasicDialog();
+                            }
+                        }
+                    });
+
                 } else
-                    Toast.makeText(this, "请选中要删除的联系人", Toast.LENGTH_SHORT).show();
+                    showToastShort("请选中要删除的联系人");
                 break;
         }
         return super.onOptionsItemSelected(item);
+    }
+
+    private void invalidateListView(boolean isCbVisible) {
+        mAdapter.setCbVisible(isCbVisible);
+        invalidateOptionsMenu();
+        if (isCbVisible) //don't work todo
+            mSearchView.setFocusable(false);
+        else
+            mSearchView.setFocusable(true);
     }
 
     @Override
     protected void onResume() {
         super.onResume();
         loadDataFromDb();
+
     }
 
     //当dialog show时不响应back press
     @Override
     public void onBackPressed() {
         if (mAdapter != null && mAdapter.isCbVisible()) {
-            mAdapter.setCbVisible(false);
-            invalidateOptionsMenu();
+            invalidateListView(false);
         } else
             super.onBackPressed();
     }

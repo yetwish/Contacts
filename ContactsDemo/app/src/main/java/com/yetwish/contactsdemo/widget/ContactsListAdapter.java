@@ -50,7 +50,7 @@ public class ContactsListAdapter extends BaseAdapter implements SectionIndexer {
 
     @Override
     public long getItemId(int position) {
-        return position;
+        return mData.get(position).getId();
     }
 
     @Override

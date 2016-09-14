@@ -19,6 +19,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
+ * 导入页面
  * Created by yetwish on 2016/9/3.
  */
 public class ContactsLoadActivity extends BaseActivity {

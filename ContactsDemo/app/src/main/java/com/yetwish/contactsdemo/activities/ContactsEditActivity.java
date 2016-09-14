@@ -18,6 +18,7 @@ import com.yetwish.contactsdemo.BaseActivity;
 import com.yetwish.contactsdemo.R;
 import com.yetwish.contactsdemo.database.DbContactsManager;
 import com.yetwish.contactsdemo.model.Contacts;
+import com.yetwish.contactsdemo.utils.ContactsUtils;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -112,18 +113,22 @@ public class ContactsEditActivity extends BaseActivity {
                 //完成
                 String name = getTrimText(etName);
                 if ("".equals(name)) {
-                    Toast.makeText(this, "联系人名称不能为空", Toast.LENGTH_SHORT).show();
+                    showToastShort("联系人名称不能为空");
                     return true;
                 }
                 //保存联系人
                 Contacts contacts = new Contacts();
                 contacts.setName(name);
                 contacts.setPhoneNumber(getPhoneNumbers());
+                //获取sortKey 和 searchKey
+                ContactsUtils.updateSortKey(contacts);
                 if (mContacts == null) {
                     DbContactsManager.getInstance().insert(contacts);
                 } else if (!contacts.equals(mContacts)) { //如果没有改变则不需要更新
+                    contacts.setId(mContacts.getId());
                     DbContactsManager.getInstance().update(contacts);
                 }
+                hideKeyBoard();
                 finish();
                 break;
             case android.R.id.home:

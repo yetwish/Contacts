@@ -17,7 +17,7 @@
         <activity
             android:name=".activities.ContactsListActivity"
             android:label="@string/contacts_title"
-            android:windowSoftInputMode="adjustPan|stateHidden">
+            android:windowSoftInputMode="adjustPan|stateHidden"
             android:screenOrientation="portrait">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />

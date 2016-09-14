@@ -5,6 +5,7 @@ import android.support.annotation.Nullable;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
@@ -18,7 +19,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * 联系人详情页  
+ * 联系人详情页
  * Created by yetwish on 2016/9/3.
  */
 public class ContactsDetailActivity extends BaseActivity {
@@ -43,29 +44,26 @@ public class ContactsDetailActivity extends BaseActivity {
         mContacts = (Contacts) getIntent().getSerializableExtra(EXTRA_CONTACTS);
 
         tvName.setText(mContacts.getName());
-        for (String number : mContacts.getPhoneNumber()) {
-            addPhoneNumberView(number);
-        }
+        showPhoneNumbers();
     }
 
-    private void addPhoneNumberView(String number) {
-        TextView tvNumber = (TextView) LayoutInflater.from(this).inflate(R.layout.phone_textview, null);
-        llPhoneNumbers.addView(tvNumber);
-        tvNumber.setText(number);
-        mViews.add(tvNumber);
+    private void showPhoneNumbers() {
+        for (String number : mContacts.getPhoneNumber()) {
+            TextView tvNumber = (TextView) LayoutInflater.from(this).inflate(R.layout.phone_textview, null);
+            llPhoneNumbers.addView(tvNumber);
+            tvNumber.setText(number);
+            mViews.add(tvNumber);
+        }
     }
 
 
     private void updateContactsInfo() {
         tvName.setText(mContacts.getName());
-        List<String> phoneNumbers = mContacts.getPhoneNumber();
-        for (int i = 0; i < phoneNumbers.size(); i++) {
-            if (i < mViews.size()) {
-                mViews.get(i).setText(phoneNumbers.get(i));
-            } else {
-                addPhoneNumberView(phoneNumbers.get(i));
-            }
+        for (View view : mViews) {
+            llPhoneNumbers.removeView(view);
         }
+        mViews.clear();
+        showPhoneNumbers();
     }
 
     @Override
@@ -74,7 +72,8 @@ public class ContactsDetailActivity extends BaseActivity {
         DbContactsManager.getInstance().query(mContacts.getId(), new ApiCallback<Contacts>() {
             @Override
             public void onSuccess(Contacts data) {
-                if (data.getName() == null || mContacts.equals(data)) return; // TODO: 2016/9/12
+                if (mContacts.equals(data)) return;
+                mContacts = data;
                 updateContactsInfo();
             }
 

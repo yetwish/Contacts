@@ -16,6 +16,7 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.text.SimpleDateFormat;
@@ -34,6 +35,8 @@ public class FileUtils {
     private static final String DATA_DIR = "/data/data/com.yetwish.contactsdemo/files/";
 
     private static final String FILE_EXTENSION = ".contacts.json";
+
+    public static final String DEFAULT_DATA_FILE_NAME = "data" + FILE_EXTENSION;
 
     private static FileFilter mFilter = new FileFilter() {
         @Override
@@ -109,24 +112,27 @@ public class FileUtils {
      * @param file
      * @param callback
      */
-    public static void loadContacts(final File file, @NonNull final ApiCallback<List<Contacts>> callback) {
-        new AsyncTask<Void, Void, List<Contacts>>() {
+    public static void loadContacts(final File file, @NonNull final ApiCallback<Void> callback) {
+        new AsyncTask<Void, Void, Boolean>() {
             @Override
-            protected List<Contacts> doInBackground(Void... params) {
+            protected Boolean doInBackground(Void... params) {
                 BufferedReader reader = null;
-                List<Contacts> list = new ArrayList<Contacts>();
                 try {
                     reader = new BufferedReader(new InputStreamReader(new FileInputStream(file.getAbsolutePath())));
                     String line;
                     while ((line = reader.readLine()) != null) {
-                        list.add(JsonUtils.objFromJson(line, Contacts.class));
+                        Contacts contacts = JsonUtils.objFromJson(line, Contacts.class);
+                        contacts.setName(ContactsUtils.getActualName(contacts.getName())); //对名字进行处理
+                        //获取sortKey 和 searchKey
+                        ContactsUtils.updateSortKey(contacts);
+                        //保存到数据库
+                        DbContactsManager.getInstance().insert(contacts);
                     }
-                    //保存到数据库
-                    DbContactsManager.getInstance().insert(list);
+                    return true;
                 } catch (FileNotFoundException e) {
-                    e.printStackTrace();
+                    return false;
                 } catch (IOException e) {
-                    e.printStackTrace();
+                    return false;
                 } finally {
                     if (reader != null)
                         try {
@@ -135,16 +141,16 @@ public class FileUtils {
                             e.printStackTrace();
                         }
                 }
-                return list;
             }
 
             @Override
-            protected void onPostExecute(List<Contacts> result) {
+            protected void onPostExecute(Boolean result) {
                 super.onPostExecute(result);
-                if (result.size() < 1)
-                    callback.onFailed("");
-                else
-                    callback.onSuccess(result);
+                if (result) {
+                    callback.onSuccess(null);
+                } else {
+                    callback.onFailed("Something wrong happened when import contacts");
+                }
             }
         }.execute();
 
@@ -162,7 +168,7 @@ public class FileUtils {
      * @param callback
      */
     public static void saveContacts(final List<Contacts> list, final String customFileName, @NonNull final ApiCallback<String> callback) {
-        if (customFileName == null) {
+        if (customFileName == null || customFileName.trim().equals("")) {
             saveContacts(list, callback);
             return;
         }
@@ -179,7 +185,7 @@ public class FileUtils {
                     for (Contacts item : list) {
                         writer.write(JsonUtils.toJson(item));
                         writer.newLine();
-                        writer.flush();//todo ??是否需要
+                        writer.flush();//todo ??是否需要 数据量较大时？
                     }
                 } catch (FileNotFoundException e) {
                     e.printStackTrace();
@@ -216,6 +222,47 @@ public class FileUtils {
                 e.printStackTrace();
             }
         }
+    }
+
+    /**
+     * 将数据文件推到手机中
+     */
+    public static void pushData2SDCard(InputStream fileInputStream, ApiCallback<Void> callback) {
+        File fileOut = new File(getFilePath() + DEFAULT_DATA_FILE_NAME);
+        createFileIfNotExists(fileOut);
+        BufferedReader reader = null;
+        BufferedWriter writer = null;
+        try {
+            reader = new BufferedReader(new InputStreamReader(fileInputStream));
+            writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(fileOut)));
+            String line = null;
+            while ((line = reader.readLine()) != null) {
+                writer.write(line);
+                writer.newLine();
+            }
+            callback.onSuccess(null);
+        } catch (FileNotFoundException e) {
+            callback.onFailed(e.toString());
+        } catch (IOException e) {
+            callback.onFailed(e.toString());
+        } finally {
+            if (reader != null) {
+                try {
+                    reader.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+            if (writer != null) {
+                try {
+                    writer.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+
+
     }
 
 }

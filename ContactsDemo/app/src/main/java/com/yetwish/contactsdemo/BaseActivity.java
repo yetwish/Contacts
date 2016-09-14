@@ -9,6 +9,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.text.InputType;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
+import android.widget.Toast;
 
 import com.afollestad.materialdialogs.DialogAction;
 import com.afollestad.materialdialogs.MaterialDialog;
@@ -27,8 +28,6 @@ public class BaseActivity extends AppCompatActivity {
     protected MaterialDialog mInputDialog;
 
     protected MaterialDialog mBasicDialog;
-
-    protected MaterialDialog mListDialog;
 
     protected
     @ColorInt
@@ -96,17 +95,6 @@ public class BaseActivity extends AppCompatActivity {
         }
     }
 
-    protected void showListDialog(List<String> list, CharSequence title, MaterialDialog.ListCallbackSingleChoice listener) {
-        mListDialog = new MaterialDialog.Builder(this)
-                .title(title)
-                .backgroundColor(mDialogBgColor)
-                .titleColor(mDialogTitleTextColor)
-                .contentColor(mDialogContentTextColor)
-                .items(list)
-                .itemsCallbackSingleChoice(-1, listener)
-                .show();
-    }
-
     protected void showInputDialog(CharSequence title, CharSequence hintText, MaterialDialog.InputCallback callback) {
         showInputDialog(title, hintText, "", callback);
     }
@@ -156,28 +144,43 @@ public class BaseActivity extends AppCompatActivity {
     }
 
 
-    protected void hideListDialog(){
-        if (mListDialog != null && mListDialog.isShowing()) {
-            mListDialog.dismiss();
-        }
+    protected void showToastShort(String msg) {
+        Toast.makeText(this, msg, Toast.LENGTH_SHORT).show();
     }
 
-    protected void hideBasicDialog() {
+    protected void showToastLong(String msg) {
+        Toast.makeText(this, msg, Toast.LENGTH_LONG).show();
+    }
+
+    protected boolean hideBasicDialog() {
         if (mBasicDialog != null && mBasicDialog.isShowing()) {
             mBasicDialog.dismiss();
+            return true;
         }
+        return false;
     }
 
-    protected void hideProgressDialog() {
+    protected boolean hideProgressDialog() {
         if (mProgressDialog != null && mProgressDialog.isShowing()) {
             mProgressDialog.dismiss();
+            return true;
         }
+        return false;
     }
 
-    protected void hideInputDialog() {
+    protected boolean hideInputDialog() {
         if (mInputDialog != null && mInputDialog.isShowing()) {
             mInputDialog.dismiss();
+            return true;
         }
+        return false;
+    }
+
+    @Override
+    public void onBackPressed() {
+        if(hideBasicDialog()|| hideProgressDialog()|| hideInputDialog())
+            return;
+        super.onBackPressed();
     }
 
     @Override
@@ -190,7 +193,6 @@ public class BaseActivity extends AppCompatActivity {
         hideProgressDialog();
         hideInputDialog();
         hideBasicDialog();
-        hideListDialog();
     }
 
     private void destroyDialog() {
@@ -198,7 +200,6 @@ public class BaseActivity extends AppCompatActivity {
         mProgressDialog = null;
         mInputDialog = null;
         mBasicDialog = null;
-        mListDialog = null;
     }
 
 
