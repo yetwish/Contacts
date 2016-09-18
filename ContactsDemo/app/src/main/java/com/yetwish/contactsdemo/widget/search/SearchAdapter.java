@@ -74,8 +74,9 @@ public class SearchAdapter extends CursorAdapter {
     }
 
     public Cursor queryLettersKey() {
-        return DbContactsManager.getInstance().query(null, "searchKey like ? or sortKey like ? or name like ?",
-                new String[]{mLikeQueryKey, mLikeQueryKey, mLikeQueryKey}, null);
+        Cursor cursor = DbContactsManager.getInstance().query(null, "sortKey like ? and searchKey like ?  or name like ? or searchKey like ?",
+                new String[]{mLikeQueryKey, "%"+mActualQueryKey.charAt(0) + "%", mLikeQueryKey, mLikeQueryKey}, null);
+        return cursor;
     }
 
     @Override

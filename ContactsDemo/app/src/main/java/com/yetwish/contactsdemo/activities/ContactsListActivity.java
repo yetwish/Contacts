@@ -64,7 +64,7 @@ public class ContactsListActivity extends BaseActivity {
 
                     @Override
                     public void onFailed(String msg) {
-                        // TODO: 2016/9/14 写入失败
+                        showToastShort("发生了错误 "+msg);
                     }
                 });
             } catch (IOException e) {
@@ -80,7 +80,6 @@ public class ContactsListActivity extends BaseActivity {
                 mDataList.addAll(contactsList);
                 mAdapter.notifyDataSetChanged();
                 invalidateOptionsMenu();
-                hideProgressDialog();
             }
 
             @Override
@@ -174,11 +173,12 @@ public class ContactsListActivity extends BaseActivity {
             if (resultCode == RESULT_OK) {
                 //load
                 File file = (File) data.getSerializableExtra(ContactsLoadActivity.EXTRA_FILE);
-                showProgressDialog(getString(R.string.contacts_importing));
-                FileUtils.importContacts(file, new ApiCallback<Void>() {
+                showProgressDialog(getString(R.string.contacts_importing)); //显示dialog
+                FileUtils.importContacts(file, new ApiCallback<List<Contacts>>() {
                     @Override
-                    public void onSuccess(Void data) {
+                    public void onSuccess(List<Contacts> data) {
                         loadDataFromDb();
+                        hideProgressDialog();
                     }
 
                     @Override
@@ -278,36 +278,38 @@ public class ContactsListActivity extends BaseActivity {
         return super.onOptionsItemSelected(item);
     }
 
-    private void deleteContacts(int position){
-        if(position != -1){
+    private void deleteContacts(int position) {
+        if (position != -1) {
             doDelete(mDataList.get(position));
             mAdapter.notifyDataSetChanged();
             showToastShort("删除成功");
-        }else {
+        } else {
             showProgressDialog("正在删除");
-           new AsyncTask<Void, Void, Void>(){
-               @Override
-               protected Void doInBackground(Void... params) {
-                   //删除选中的
-                   for (Contacts contacts : mAdapter.getCheckedContacts()) {
-                       doDelete(contacts);
-                   }
-                   return null;
-               }
+            new AsyncTask<Void, Void, Void>() {
+                @Override
+                protected Void doInBackground(Void... params) {
+                    //删除选中的
+                    List<Contacts> list = mAdapter.getCheckedContacts();
+                    DbContactsManager.getInstance().delete(list);
+                    for (Contacts contacts : list) {
+                        mDataList.remove(contacts);
+                    }
+                    return null;
+                }
 
-               @Override
-               protected void onPostExecute(Void aVoid) {
-                   super.onPostExecute(aVoid);
-                   invalidateListView(false);
-                   hideProgressDialog();
-                   showToastShort("删除成功");
-               }
-           }.execute();
+                @Override
+                protected void onPostExecute(Void aVoid) {
+                    super.onPostExecute(aVoid);
+                    invalidateListView(false);
+                    hideProgressDialog();
+                    showToastShort("删除成功");
+                }
+            }.execute();
         }
 
     }
 
-    private void doDelete(Contacts contacts){
+    private void doDelete(Contacts contacts) {
         mDataList.remove(contacts);
         DbContactsManager.getInstance().delete(contacts.getId());
     }
@@ -325,7 +327,7 @@ public class ContactsListActivity extends BaseActivity {
     @Override
     protected void onResume() {
         super.onResume();
-        loadDataFromDb();
+        loadDataFromDb(); // TODO: 2016/9/18 优化
     }
 
     //当dialog show时不响应back press

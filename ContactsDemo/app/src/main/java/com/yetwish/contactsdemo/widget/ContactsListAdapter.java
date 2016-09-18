@@ -20,7 +20,7 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * 联系人列表adapter 代理 todo 编辑
+ * 联系人列表adapter 代理
  * Created by yetwish on 2016/9/6.
  */
 public class ContactsListAdapter extends BaseAdapter implements SectionIndexer {
@@ -109,7 +109,6 @@ public class ContactsListAdapter extends BaseAdapter implements SectionIndexer {
     }
 
     /**
-     * todo 优化
      *
      * @param position
      */

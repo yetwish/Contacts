@@ -2,6 +2,7 @@ package com.yetwish.contactsdemo.activities;
 
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -25,6 +26,8 @@ import java.util.List;
 public class ContactsDetailActivity extends BaseActivity {
 
     public static final String EXTRA_CONTACTS = "EXTRA_CONTACTS";
+
+//    public static final String TAG = "ContactsListActivity";
 
     private LinearLayout llPhoneNumbers;
     private TextView tvName;

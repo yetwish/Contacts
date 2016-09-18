@@ -16,7 +16,7 @@ import android.widget.ListView;
 import com.yetwish.contactsdemo.R;
 
 /**
- * 自定义搜索框 todo text click
+ * 自定义搜索框 TODO emptyView
  * Created by yetwish on 2016/9/12.
  */
 public class CustomSearchView extends LinearLayout implements View.OnClickListener {
@@ -57,7 +57,6 @@ public class CustomSearchView extends LinearLayout implements View.OnClickListen
         mAdapter = new SearchAdapter(mContext);
         mlvSearchResult.setAdapter(mAdapter);
 
-        // TODO: 2016/9/13 emptyView
         mlvSearchResult.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {

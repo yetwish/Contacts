@@ -19,7 +19,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * 封装与database交互的方法 CRUD  todo 更新/插入/delete 是否需要放到dbThread中执行
+ * 封装与database交互的方法 CRUD
  * Created by yetwish on 2016/9/8.
  */
 public class DbContactsManager {
@@ -43,6 +43,8 @@ public class DbContactsManager {
     private HandlerThread mDbThread;
 
     private Handler mMainHandler;
+
+    private Runnable mAllQueryRunnable;
 
     private DbContactsManager() {
         if (BaseApplication.getInstance() != null) {
@@ -68,7 +70,9 @@ public class DbContactsManager {
      */
     public void query(@NonNull final ApiCallback<List<Contacts>> callback) {
         final List<Contacts> contactsList = new ArrayList<>();
-        mDbHandler.post(new Runnable() {
+        if (mAllQueryRunnable != null)
+            mDbHandler.removeCallbacks(mAllQueryRunnable);
+        mAllQueryRunnable = new Runnable() {
             @Override
             public void run() {
                 Cursor cursor = null;
@@ -96,9 +100,14 @@ public class DbContactsManager {
                 } finally {
                     if (cursor != null)
                         cursor.close();
+                    if (mAllQueryRunnable != null) {
+                        mDbHandler.removeCallbacks(mAllQueryRunnable);
+                        mAllQueryRunnable = null;
+                    }
                 }
             }
-        });
+        };
+        mDbHandler.post(mAllQueryRunnable);
     }
 
 
@@ -236,7 +245,7 @@ public class DbContactsManager {
      * @param values
      * @param selection
      * @param selectionArgs
-     * @return updateRoｗ　todo 多条？
+     * @return updateRow　
      */
     public int update(ContentValues values, String selection, String[] selectionArgs) {
         return mDb.update("contacts", values, selection, selectionArgs);
@@ -252,8 +261,25 @@ public class DbContactsManager {
         return delete("_id = ?", new String[]{String.valueOf(id)});
     }
 
+
     /**
-     * 根据where条件 删除记录  todo 多条？ deletedRow是啥
+     * 删除多条记录
+     * @param list
+     */
+    public void delete(List<Contacts> list) {
+        mDb.beginTransaction();
+        try {
+            for (Contacts contacts : list) {
+                delete(contacts.getId());
+            }
+            mDb.setTransactionSuccessful();
+        }finally {
+            mDb.endTransaction();
+        }
+    }
+
+    /**
+     * 根据where条件 删除记录
      *
      * @param selection
      * @param selectionArgs

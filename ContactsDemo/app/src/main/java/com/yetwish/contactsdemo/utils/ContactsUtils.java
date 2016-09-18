@@ -40,6 +40,8 @@ public class ContactsUtils {
                 searchKeyBuilder.append(Pinyin.toPinyin(c).charAt(0));
             } else {
                 sortKeyBuilder.append(Character.toUpperCase(c));
+                if(isNumber(c))
+                    searchKeyBuilder.append(c);
                 if (toAdd && isLetter(c)) {
                     toAdd = false;
                     searchKeyBuilder.append(Character.toUpperCase(c));

@@ -25,7 +25,6 @@ import java.util.Calendar;
 import java.util.List;
 
 /**
- * todo
  * 文件操作帮助类
  * Created by yetwish on 2016/9/9.
  */
@@ -112,11 +111,12 @@ public class FileUtils {
      * @param file
      * @param callback
      */
-    public static void importContacts(final File file, @NonNull final ApiCallback<Void> callback) {
-        new AsyncTask<Void, Void, Boolean>() {
+    public static void importContacts(final File file, @NonNull final ApiCallback<List<Contacts>> callback) {
+        new AsyncTask<Void, Void, List<Contacts>>() {
             @Override
-            protected Boolean doInBackground(Void... params) {
+            protected List<Contacts> doInBackground(Void... params) {
                 BufferedReader reader = null;
+                List<Contacts> list = new ArrayList<Contacts>();
                 try {
                     reader = new BufferedReader(new InputStreamReader(new FileInputStream(file.getAbsolutePath())));
                     String line;
@@ -125,14 +125,15 @@ public class FileUtils {
                         contacts.setName(ContactsUtils.getActualName(contacts.getName())); //对名字进行处理
                         //获取sortKey 和 searchKey
                         ContactsUtils.updateSortKey(contacts);
-                        //保存到数据库
-                        DbContactsManager.getInstance().insert(contacts);
+                        list.add(contacts);
                     }
-                    return true;
+                    //保存到数据库
+                    DbContactsManager.getInstance().insert(list);
+                    return list;
                 } catch (FileNotFoundException e) {
-                    return false;
+                    return null;
                 } catch (IOException e) {
-                    return false;
+                    return null;
                 } finally {
                     if (reader != null)
                         try {
@@ -144,10 +145,10 @@ public class FileUtils {
             }
 
             @Override
-            protected void onPostExecute(Boolean result) {
+            protected void onPostExecute(List<Contacts> result) {
                 super.onPostExecute(result);
-                if (result) {
-                    callback.onSuccess(null);
+                if (result != null && result.size() > 0) {
+                    callback.onSuccess(result);
                 } else {
                     callback.onFailed("Something wrong happened when import contacts");
                 }
@@ -161,7 +162,7 @@ public class FileUtils {
     }
 
     /**
-     * 异步加载 todo 有问题
+     * 异步加载
      *
      * @param list
      * @param customFileName
@@ -185,7 +186,6 @@ public class FileUtils {
                     for (Contacts item : list) {
                         writer.write(JsonUtils.toJson(item));
                         writer.newLine();
-                        writer.flush();//todo ??是否需要 数据量较大时？
                     }
                 } catch (FileNotFoundException e) {
                     e.printStackTrace();

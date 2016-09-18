@@ -4,6 +4,8 @@ import android.content.Context;
 import android.graphics.Canvas;
 import android.graphics.Paint;
 import android.graphics.RectF;
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.v4.content.ContextCompat;
 import android.view.MotionEvent;
 import android.widget.ListView;
@@ -100,9 +102,8 @@ public class IndexScroller implements IIndexScroller {
         mPreviewSize = mPreviewPadding * 2 + mPreviewTextHeight;
     }
 
-    //todo 参数是否为null 判断
     @Override
-    public void setSectionIndexer(SectionIndexer indexer) {
+    public void setSectionIndexer(@NonNull SectionIndexer indexer) {
         mIndexer = indexer;
         mSections = (String[]) mIndexer.getSections();
         if (mSections == null)
@@ -127,7 +128,7 @@ public class IndexScroller implements IIndexScroller {
                 if (isScroll) {
                     //move多次调用，当获取到index与mCurIndex不同时才需要通知listView.setSelection()
                     int tempIndex = obtainIndexByPosition(event.getY());
-                    if (tempIndex >= mSections.length) tempIndex = mSections.length - 1; //todo
+                    if (tempIndex >= mSections.length) tempIndex = mSections.length - 1;
                     if (tempIndex < 0) tempIndex = 0;
                     if (mCurIndex != tempIndex) {
                         mCurIndex = tempIndex;
